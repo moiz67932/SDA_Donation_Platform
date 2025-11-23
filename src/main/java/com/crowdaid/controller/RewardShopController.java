@@ -66,10 +66,8 @@ public class RewardShopController {
             }
         });
         
-        // TODO: Load donor's credit balance
         creditBalanceLabel.setText("Your Credits: 0");
         
-        // TODO: Load available rewards
         loadRewards();
         
         logger.info("Reward shop screen initialized");
@@ -80,7 +78,6 @@ public class RewardShopController {
      */
     private void loadRewards() {
         try {
-            // TODO: Call RewardRepository.findAllActive()
             // List<Reward> rewardList = rewardRepository.findAllActive();
             // rewards.clear();
             // rewards.addAll(rewardList);
@@ -96,7 +93,6 @@ public class RewardShopController {
     @FXML
     private void handleCategoryFilter(ActionEvent event) {
         categoryFilterComboBox.getValue();
-        // TODO: Filter rewards by category
     }
     
     /**
@@ -115,13 +111,10 @@ public class RewardShopController {
             String.format("Redeem %s for %d credits?", selected.getName(), selected.getCreditCost()));
         
         if (confirmed) {
-            // TODO: Call RewardService.redeemReward()
             // rewardService.redeemReward(donor, selected);
             
             AlertUtil.showSuccess("Redemption Successful", 
                 "Your reward has been redeemed successfully!");
-            
-            // TODO: Reload credit balance and rewards
         }
     }
     

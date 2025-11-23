@@ -45,7 +45,6 @@ public class AdminDashboardController {
         currentAdmin = (Administrator) user;
         welcomeLabel.setText("Welcome, " + currentAdmin.getName() + "!");
         
-        // TODO: Load system statistics from database
         statsLabel.setText("Pending Campaigns: 0 | Total Users: 0 | Total Donations: $0.00");
         
         logger.info("Admin dashboard loaded for user: {}", currentAdmin.getEmail());

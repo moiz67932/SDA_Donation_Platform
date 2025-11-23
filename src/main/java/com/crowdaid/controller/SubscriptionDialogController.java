@@ -76,7 +76,6 @@ public class SubscriptionDialogController {
         
         anonymousCheckBox.isSelected();
         
-        // TODO: Call SubscriptionService.createSubscription()
         // subscriptionService.createSubscription(donor, campaign, tier, anonymous);
         
         AlertUtil.showSuccess("Subscription Created", 

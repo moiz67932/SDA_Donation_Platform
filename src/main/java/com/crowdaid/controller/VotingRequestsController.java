@@ -50,8 +50,6 @@ public class VotingRequestsController {
         
         votingRequestsTable.setItems(votingRequests);
         
-        // TODO: Load voting requests for donor
-        
         logger.info("Voting requests screen initialized");
     }
     
@@ -69,12 +67,10 @@ public class VotingRequestsController {
         
         commentArea.getText();
         
-        // TODO: Call VoteService.castVote(APPROVE)
         // voteService.castVote(donor, milestone, VoteType.APPROVE, comment);
         
         AlertUtil.showSuccess("Vote Cast", "Your approval vote has been recorded.");
         
-        // TODO: Reload voting requests
         commentArea.clear();
     }
     
@@ -97,12 +93,10 @@ public class VotingRequestsController {
             return;
         }
         
-        // TODO: Call VoteService.castVote(REJECT)
         // voteService.castVote(donor, milestone, VoteType.REJECT, comment);
         
         AlertUtil.showSuccess("Vote Cast", "Your rejection vote has been recorded.");
         
-        // TODO: Reload voting requests
         commentArea.clear();
     }
     

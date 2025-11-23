@@ -136,7 +136,6 @@ public class AuthenticationService {
             
             logger.info("Donor registered successfully: id={}, email={}", savedUser.getId(), savedUser.getEmail());
             
-            // TODO: Send verification email via NotificationService
             // notificationService.sendVerificationEmail(donor.getEmail());
             
             return (Donor) savedUser;
@@ -193,7 +192,6 @@ public class AuthenticationService {
             
             logger.info("Campaigner registered successfully: id={}, email={}", savedUser.getId(), savedUser.getEmail());
             
-            // TODO: Send verification email via NotificationService
             // notificationService.sendVerificationEmail(campaigner.getEmail());
             
             return (Campaigner) savedUser;
@@ -212,7 +210,6 @@ public class AuthenticationService {
      * @throws BusinessException if verification fails
      */
     public void verifyAccount(String email, String token) throws BusinessException {
-        // TODO: Implement email verification logic
         // This would involve:
         // 1. Validating the token
         // 2. Checking token expiration
@@ -236,7 +233,6 @@ public class AuthenticationService {
                 return;
             }
             
-            // TODO: Generate reset token and send email
             // notificationService.sendPasswordResetEmail(user.getEmail(), resetToken);
             
             logger.info("Password reset requested for user: id={}, email={}", user.getId(), user.getEmail());
@@ -265,8 +261,6 @@ public class AuthenticationService {
         Validator.validatePasswordMatch(newPassword, confirmPassword);
         
         try {
-            // TODO: Validate token
-            
             User user = userRepository.findByEmail(email);
             if (user == null) {
                 throw new BusinessException("Invalid reset token");

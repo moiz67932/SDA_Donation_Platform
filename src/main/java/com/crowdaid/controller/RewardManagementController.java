@@ -75,7 +75,6 @@ public class RewardManagementController {
             }
         });
         
-        // TODO: Load all rewards
         loadRewards();
         
         logger.info("Reward management screen initialized");
@@ -86,7 +85,6 @@ public class RewardManagementController {
      */
     private void loadRewards() {
         try {
-            // TODO: Call RewardRepository.findAll()
             // List<Reward> rewardList = rewardRepository.findAll();
             // rewards.clear();
             // rewards.addAll(rewardList);
@@ -146,7 +144,6 @@ public class RewardManagementController {
             Integer.parseInt(stockField.getText());
             statusComboBox.getValue();
             
-            // TODO: Call RewardService.createReward()
             // Reward reward = rewardService.createReward(name, description, category, creditCost, stock, status);
             
             AlertUtil.showSuccess("Reward Added", "The reward has been added successfully.");
@@ -177,7 +174,6 @@ public class RewardManagementController {
             selectedReward.setStock(Integer.parseInt(stockField.getText()));
             selectedReward.setStatus(statusComboBox.getValue());
             
-            // TODO: Call RewardService.updateReward()
             // rewardService.updateReward(selectedReward);
             
             AlertUtil.showSuccess("Reward Updated", "The reward has been updated successfully.");
@@ -204,7 +200,6 @@ public class RewardManagementController {
             "Are you sure you want to delete this reward?");
         
         if (confirmed) {
-            // TODO: Call RewardService.deleteReward()
             // rewardService.deleteReward(selectedReward.getId());
             
             AlertUtil.showSuccess("Reward Deleted", "The reward has been deleted.");

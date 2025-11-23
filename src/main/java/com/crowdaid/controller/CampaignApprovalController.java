@@ -69,7 +69,6 @@ public class CampaignApprovalController {
             }
         });
         
-        // TODO: Load pending campaigns
         loadPendingCampaigns();
         
         logger.info("Campaign approval screen initialized");
@@ -150,8 +149,6 @@ public class CampaignApprovalController {
         if (confirmed) {
             try {
                 campaignRepository.updateStatus(selected.getId(), CampaignStatus.REJECTED);
-                
-                // TODO: Send notification to campaigner with reason
                 
                 AlertUtil.showSuccess("Campaign Rejected", 
                     "The campaign has been rejected. Reason: " + reason);

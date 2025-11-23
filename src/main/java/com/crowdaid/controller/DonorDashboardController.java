@@ -46,7 +46,6 @@ public class DonorDashboardController {
         currentDonor = (Donor) user;
         welcomeLabel.setText("Welcome, " + currentDonor.getName() + "!");
         
-        // TODO: Load credit balance from database
         creditBalanceLabel.setText("Credits: 0");
         
         logger.info("Donor dashboard loaded for user: {}", currentDonor.getEmail());

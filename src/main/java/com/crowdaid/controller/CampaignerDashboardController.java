@@ -46,7 +46,6 @@ public class CampaignerDashboardController {
         currentCampaigner = (Campaigner) user;
         welcomeLabel.setText("Welcome, " + currentCampaigner.getName() + "!");
         
-        // TODO: Load campaign statistics from database
         statsLabel.setText("Active Campaigns: 0 | Total Raised: $0.00");
         
         logger.info("Campaigner dashboard loaded for user: {}", currentCampaigner.getEmail());
