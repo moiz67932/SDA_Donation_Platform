@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+     fx:controller="com.crowdaid.controller.DonationDialogController"
+     spacing="20" styleClass="root" prefWidth="450" prefHeight="400">
+    
+    <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+    
+    <!-- Title -->
+    <Label fx:id="campaignLabel" text="Make a Donation" styleClass="title" wrapText="true">
+        <font><Font name="System Bold" size="20"/></font>
+    </Label>
+    
+    <Separator/>
+    
+    <!-- Donation Form -->
+    <VBox spacing="15">
+        
+        <!-- Amount Field -->
+        <VBox spacing="5">
+            <Label text="Donation Amount ($)" styleClass="field-label">
+                <font><Font name="System Bold" size="14"/></font>
+            </Label>
+            <TextField fx:id="amountField" promptText="Enter amount (e.g., 50.00)" 
+                      prefHeight="35"/>
+        </VBox>
+        
+        <!-- Anonymous Checkbox -->
+        <CheckBox fx:id="anonymousCheckBox" text="Make this donation anonymous" 
+                 styleClass="checkbox"/>
+        
+        <!-- Message Area -->
+        <VBox spacing="5">
+            <Label text="Message (Optional)" styleClass="field-label">
+                <font><Font name="System Bold" size="14"/></font>
+            </Label>
+            <TextArea fx:id="messageArea" promptText="Add a message to the campaigner..." 
+                     wrapText="true" prefHeight="100"/>
+        </VBox>
+        
+    </VBox>
+    
+    <Region VBox.vgrow="ALWAYS"/>
+    
+    <!-- Action Buttons -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button fx:id="donateButton" text="Donate Now" 
+               onAction="#handleDonate" styleClass="primary-button" 
+               prefWidth="150" prefHeight="35"/>
+        <Button fx:id="cancelButton" text="Cancel" 
+               onAction="#handleCancel" styleClass="secondary-button" 
+               prefWidth="150" prefHeight="35"/>
+    </HBox>
+    
+</VBox>

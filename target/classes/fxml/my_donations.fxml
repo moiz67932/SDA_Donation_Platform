@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.MyDonationsController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="backButton" text="← Back" onAction="#handleBack" 
+                   styleClass="secondary-button"/>
+            <Label text="My Donations" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="totalDonatedLabel" text="Total Donated: $0.00" styleClass="stats-label">
+                <font><Font name="System Bold" size="14"/></font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="15">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            
+            <!-- Donations Table -->
+            <TableView fx:id="donationsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
+                    <TableColumn fx:id="campaignColumn" text="Campaign" prefWidth="250"/>
+                    <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
+                    <TableColumn fx:id="anonymousColumn" text="Anonymous" prefWidth="100"/>
+                    <TableColumn fx:id="messageColumn" text="Message" prefWidth="200"/>
+                </columns>
+            </TableView>
+            
+            <!-- Actions -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="viewCampaignButton" text="View Campaign" 
+                       onAction="#handleViewCampaign" styleClass="primary-button"/>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.CreateCampaignController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="cancelButton" text="← Cancel" onAction="#handleCancel" 
+                   styleClass="secondary-button"/>
+            <Label text="Create New Campaign" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox spacing="20" maxWidth="600">
+                <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+                
+                <VBox spacing="8">
+                    <Label text="Campaign Title *" styleClass="form-label"/>
+                    <TextField fx:id="titleField" promptText="Enter campaign title" 
+                              styleClass="text-field"/>
+                </VBox>
+                
+                <VBox spacing="8">
+                    <Label text="Category *" styleClass="form-label"/>
+                    <ComboBox fx:id="categoryComboBox" promptText="Select category" 
+                             prefWidth="Infinity" styleClass="combo-box"/>
+                </VBox>
+                
+                <VBox spacing="8">
+                    <Label text="Description *" styleClass="form-label"/>
+                    <TextArea fx:id="descriptionArea" promptText="Describe your campaign..." 
+                             prefHeight="200" wrapText="true" styleClass="text-area"/>
+                </VBox>
+                
+                <VBox spacing="8">
+                    <Label text="Goal Amount (USD) *" styleClass="form-label"/>
+                    <TextField fx:id="goalAmountField" promptText="e.g., 10000.00" 
+                              styleClass="text-field"/>
+                </VBox>
+                
+                <VBox spacing="8">
+                    <Label text="End Date (Optional)" styleClass="form-label"/>
+                    <DatePicker fx:id="endDatePicker" prefWidth="Infinity" 
+                               styleClass="date-picker"/>
+                </VBox>
+                
+                <Separator/>
+                
+                <HBox spacing="15" alignment="CENTER">
+                    <Button fx:id="createButton" text="Create Campaign" 
+                           onAction="#handleCreate" 
+                           styleClass="primary-button" prefWidth="200" prefHeight="45">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Button>
+                </HBox>
+                
+                <Label text="* Required fields" styleClass="hint-label">
+                    <font>
+                        <Font size="11" />
+                    </font>
+                </Label>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

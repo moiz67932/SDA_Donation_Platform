@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.BrowseCampaignsController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <VBox spacing="15" styleClass="header">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <Label text="Browse Campaigns" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            
+            <!-- Search and Filter -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Search campaigns..." 
+                          prefWidth="300" styleClass="text-field"/>
+                <ComboBox fx:id="categoryComboBox" promptText="All Categories" 
+                         prefWidth="200" styleClass="combo-box"/>
+                <Button fx:id="searchButton" text="Search" onAction="#handleSearch" 
+                       styleClass="primary-button"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="backButton" text="← Back to Dashboard" 
+                       onAction="#handleBack" styleClass="secondary-button"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="15">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            
+            <!-- Campaigns Table -->
+            <TableView fx:id="campaignsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="titleColumn" text="Campaign Title" prefWidth="250"/>
+                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120"/>
+                    <TableColumn fx:id="goalColumn" text="Goal Amount" prefWidth="120"/>
+                    <TableColumn fx:id="collectedColumn" text="Raised" prefWidth="120"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                </columns>
+            </TableView>
+            
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="viewDetailsButton" text="View Details" 
+                       onAction="#handleViewDetails" 
+                       styleClass="primary-button" prefWidth="150"/>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

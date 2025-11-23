@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.RewardShopController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <top>
+        <VBox spacing="15" styleClass="header">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label text="Reward Shop" styleClass="page-title">
+                    <font>
+                        <Font name="System Bold" size="24"/>
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="creditBalanceLabel" text="Your Credits: 0" 
+                      styleClass="credit-balance">
+                    <font>
+                        <Font name="System Bold" size="18"/>
+                    </font>
+                </Label>
+            </HBox>
+            
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Category:"/>
+                <ComboBox fx:id="categoryFilterComboBox" onAction="#handleCategoryFilter"
+                         promptText="All Categories" prefWidth="200" styleClass="combo-box"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="myRedemptionsButton" text="My Redemptions" 
+                       onAction="#handleMyRedemptions" styleClass="secondary-button"/>
+                <Button fx:id="backButton" text="← Back" onAction="#handleBack" 
+                       styleClass="secondary-button"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <center>
+        <VBox spacing="15">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            
+            <TableView fx:id="rewardsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="nameColumn" text="Reward" prefWidth="250"/>
+                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120"/>
+                    <TableColumn fx:id="costColumn" text="Credit Cost" prefWidth="100"/>
+                    <TableColumn fx:id="stockColumn" text="In Stock" prefWidth="100"/>
+                </columns>
+            </TableView>
+            
+            <VBox spacing="10" styleClass="info-card">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Description" styleClass="section-title">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="descriptionArea" editable="false" wrapText="true" 
+                         prefHeight="100" styleClass="text-area-readonly"/>
+            </VBox>
+            
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="redeemButton" text="Redeem Selected Reward" 
+                       onAction="#handleRedeem" 
+                       styleClass="accent-button" prefWidth="250" prefHeight="45">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Button>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

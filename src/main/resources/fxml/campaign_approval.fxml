@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.CampaignApprovalController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="backButton" text="Back" onAction="#handleBack" 
+                   styleClass="secondary-button"/>
+            <Label text="Approve Campaigns" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane">
+            <VBox spacing="20">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                
+                <!-- Pending Campaigns Table -->
+                <VBox spacing="10">
+                    <Label text="Pending Campaigns" styleClass="section-title">
+                        <font><Font name="System Bold" size="18"/></font>
+                    </Label>
+                    
+                    <TableView fx:id="pendingCampaignsTable" prefHeight="300" styleClass="table-view">
+                        <columns>
+                            <TableColumn fx:id="titleColumn" text="Title" prefWidth="250"/>
+                            <TableColumn fx:id="campaignerColumn" text="Campaigner ID" prefWidth="120"/>
+                            <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120"/>
+                            <TableColumn fx:id="goalColumn" text="Goal Amount" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+                
+                <!-- Campaign Details -->
+                <VBox spacing="10" styleClass="info-card">
+                    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+                    
+                    <Label text="Campaign Description" styleClass="section-title">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    
+                    <TextArea fx:id="descriptionArea" editable="false" wrapText="true" 
+                             prefHeight="150" promptText="Select a campaign to view details"/>
+                </VBox>
+                
+                <!-- Rejection Reason -->
+                <VBox spacing="10" styleClass="info-card">
+                    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+                    
+                    <Label text="Rejection Reason (if rejecting)" styleClass="section-title">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    
+                    <TextArea fx:id="rejectionReasonArea" wrapText="true" 
+                             prefHeight="100" promptText="Enter reason for rejection..."/>
+                </VBox>
+                
+                <!-- Action Buttons -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button fx:id="approveButton" text="Approve Campaign" 
+                           onAction="#handleApprove" styleClass="primary-button" 
+                           prefWidth="180"/>
+                    <Button fx:id="rejectButton" text="Reject Campaign" 
+                           onAction="#handleReject" styleClass="secondary-button" 
+                           prefWidth="180"/>
+                </HBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

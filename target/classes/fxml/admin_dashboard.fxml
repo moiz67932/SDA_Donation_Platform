@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.AdminDashboardController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Label text="CrowdAid Admin" styleClass="header-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statsLabel" text="System Statistics Loading..." 
+                  styleClass="stats-label">
+                <font>
+                    <Font size="12"/>
+                </font>
+            </Label>
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" 
+                   styleClass="secondary-button"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane">
+            <VBox alignment="CENTER" spacing="30">
+                <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+                
+                <!-- Welcome Message -->
+                <Label fx:id="welcomeLabel" text="Welcome, Administrator!" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="28"/>
+                    </font>
+                </Label>
+                
+                <!-- Dashboard Menu -->
+                <GridPane hgap="20" vgap="20" alignment="CENTER">
+                
+                <!-- Approve Campaigns -->
+                <VBox alignment="CENTER" spacing="10" styleClass="dashboard-card" 
+                     GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    <Label text="✓" styleClass="icon-label">
+                        <font><Font size="48"/></font>
+                    </Label>
+                    <Label text="Approve Campaigns">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    <Label text="Review and approve campaigns" 
+                          wrapText="true" textAlignment="CENTER" maxWidth="200"/>
+                    <Button fx:id="approveCampaignsButton" text="Approve" 
+                           onAction="#handleApproveCampaigns" 
+                           styleClass="primary-button" prefWidth="150"/>
+                </VBox>
+                
+            </GridPane>
+            
+        </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

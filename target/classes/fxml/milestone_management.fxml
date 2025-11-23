@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.MilestoneManagementController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="backButton" text="← Back" onAction="#handleBack" 
+                   styleClass="secondary-button"/>
+            <Label fx:id="campaignTitleLabel" text="Manage Milestones" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            
+            <!-- Add Milestone Section -->
+            <VBox spacing="10" styleClass="info-card">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                
+                <Label text="Add New Milestone" styleClass="section-title">
+                    <font><Font name="System Bold" size="18"/></font>
+                </Label>
+                
+                <GridPane hgap="15" vgap="10">
+                    <Label text="Title:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="titleField" promptText="Milestone title" 
+                              GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="300"/>
+                    
+                    <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextArea fx:id="descriptionField" promptText="Milestone description" 
+                             GridPane.columnIndex="1" GridPane.rowIndex="1" prefHeight="60" prefWidth="300"/>
+                    
+                    <Label text="Amount:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextField fx:id="amountField" promptText="Target amount" 
+                              GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="150"/>
+                    
+                    <Label text="Expected Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <DatePicker fx:id="expectedDatePicker" 
+                               GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="200"/>
+                </GridPane>
+                
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button fx:id="addMilestoneButton" text="Add Milestone" 
+                           onAction="#handleAddMilestone" styleClass="primary-button"/>
+                    <Button fx:id="clearButton" text="Clear" 
+                           onAction="#handleClear" styleClass="secondary-button"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Existing Milestones -->
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <Label text="Existing Milestones" styleClass="section-title">
+                    <font><Font name="System Bold" size="18"/></font>
+                </Label>
+                
+                <TableView fx:id="milestonesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="milestoneTitle Column" text="Title" prefWidth="200"/>
+                        <TableColumn fx:id="milestoneAmountColumn" text="Amount" prefWidth="100"/>
+                        <TableColumn fx:id="milestoneExpectedDateColumn" text="Expected Date" prefWidth="120"/>
+                        <TableColumn fx:id="milestoneStatusColumn" text="Status" prefWidth="120"/>
+                    </columns>
+                </TableView>
+                
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button fx:id="viewMilestoneButton" text="View Details" 
+                           onAction="#handleViewMilestone" styleClass="primary-button"/>
+                    <Button fx:id="deleteMilestoneButton" text="Delete" 
+                           onAction="#handleDeleteMilestone" styleClass="secondary-button"/>
+                </HBox>
+            </VBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

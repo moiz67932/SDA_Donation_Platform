@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+<?import java.lang.String?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.CampaignDetailsController">
+           
+    <stylesheets>
+        <URL value="@../css/styles.css"/>
+    </stylesheets>
+    
+    <styleClass>
+        <String fx:value="root"/>
+    </styleClass>
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="backButton" text="← Back" onAction="#handleBack" 
+                   styleClass="secondary-button"/>
+            <Label text="Campaign Details" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox spacing="20">
+                <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+                
+                <!-- Campaign Header -->
+                <VBox spacing="10" styleClass="info-card">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    
+                    <Label fx:id="titleLabel" text="Campaign Title" styleClass="campaign-title">
+                        <font>
+                            <Font name="System Bold" size="28"/>
+                        </font>
+                    </Label>
+                    
+                    <HBox spacing="20">
+                        <Label fx:id="categoryLabel" text="Category: General"/>
+                        <Label fx:id="campaignerLabel" text="By: Campaigner Name"/>
+                    </HBox>
+                    
+                    <Separator/>
+                    
+                    <HBox spacing="40">
+                        <VBox spacing="5">
+                            <Label text="Goal Amount" styleClass="label-header">
+                                <font><Font name="System Bold" size="12"/></font>
+                            </Label>
+                            <Label fx:id="goalLabel" text="0.00" styleClass="amount-label">
+                                <font><Font name="System Bold" size="20"/></font>
+                            </Label>
+                        </VBox>
+                        
+                        <VBox spacing="5">
+                            <Label text="Amount Raised" styleClass="label-header">
+                                <font><Font name="System Bold" size="12"/></font>
+                            </Label>
+                            <Label fx:id="collectedLabel" text="0.00" styleClass="amount-label">
+                                <font><Font name="System Bold" size="20"/></font>
+                            </Label>
+                        </VBox>
+                        
+                        <VBox spacing="5">
+                            <Label text="Status" styleClass="label-header">
+                                <font><Font name="System Bold" size="12"/></font>
+                            </Label>
+                            <Label fx:id="statusLabel" text="ACTIVE" styleClass="status-label">
+                                <font><Font name="System Bold" size="16"/></font>
+                            </Label>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <!-- Campaign Description -->
+                <VBox spacing="10" styleClass="info-card">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    
+                    <Label text="Description" styleClass="section-title">
+                        <font>
+                            <Font name="System Bold" size="18"/>
+                        </font>
+                    </Label>
+                    
+                    <TextArea fx:id="descriptionArea" editable="false" wrapText="true" 
+                             prefHeight="200" styleClass="text-area-readonly"/>
+                </VBox>
+                
+                <!-- Action Buttons -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Button fx:id="donateButton" text="Make a Donation" 
+                           onAction="#handleDonate" 
+                           styleClass="primary-button" prefWidth="200" prefHeight="50">
+                        <font>
+                            <Font name="System Bold" size="16"/>
+                        </font>
+                    </Button>
+                </HBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.crowdaid.controller.MyCampaignsController"
+           stylesheets="@../css/styles.css" styleClass="root">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Button fx:id="backButton" text="← Back" onAction="#handleBack" 
+                   styleClass="secondary-button"/>
+            <Label text="My Campaigns" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" 
+                   styleClass="secondary-button"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="15">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            
+            <!-- Campaigns Table -->
+            <TableView fx:id="campaignsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="titleColumn" text="Campaign Title" prefWidth="250"/>
+                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120"/>
+                    <TableColumn fx:id="goalColumn" text="Goal Amount" prefWidth="120"/>
+                    <TableColumn fx:id="collectedColumn" text="Raised" prefWidth="120"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                    <TableColumn fx:id="startDateColumn" text="Start Date" prefWidth="100"/>
+                    <TableColumn fx:id="endDateColumn" text="End Date" prefWidth="100"/>
+                </columns>
+            </TableView>
+            
+            <!-- Actions -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="viewDetailsButton" text="View Details" 
+                       onAction="#handleViewDetails" styleClass="primary-button"/>
+                <Button fx:id="editButton" text="Edit Campaign" 
+                       onAction="#handleEdit" styleClass="secondary-button"/>
+                <Button fx:id="manageMilestonesButton" text="Manage Milestones" 
+                       onAction="#handleManageMilestones" styleClass="accent-button"/>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>
