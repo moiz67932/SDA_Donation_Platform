@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.crowdaid.controller.ManageSubscriptionTiersController"
+            stylesheets="@../css/styles.css"
+            prefWidth="900" prefHeight="700">
+    
+    <top>
+        <VBox alignment="CENTER" spacing="10" styleClass="header-section">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Manage Subscription Tiers" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Label fx:id="campaignTitleLabel" text="Campaign Title" styleClass="subtitle">
+                <font>
+                    <Font size="16"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+    
+    <center>
+        <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <!-- Existing Tiers Table -->
+            <VBox spacing="10">
+                <Label text="Existing Subscription Tiers" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <TableView fx:id="tiersTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="tierNameColumn" text="Tier Name" prefWidth="150"/>
+                        <TableColumn fx:id="amountColumn" text="Monthly Amount ($)" prefWidth="150"/>
+                        <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="300"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            
+            <!-- Add/Edit Tier Form -->
+            <VBox spacing="15">
+                <Label text="Add/Edit Subscription Tier" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                
+                <GridPane hgap="15" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="120" prefWidth="120"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+                    
+                    <!-- Tier Name -->
+                    <Label text="Tier Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="tierNameField" promptText="e.g., Bronze, Silver, Gold" 
+                              GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    
+                    <!-- Monthly Amount -->
+                    <Label text="Monthly Amount:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="monthlyAmountField" promptText="e.g., 10.00" 
+                              GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    
+                    <!-- Description -->
+                    <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextArea fx:id="descriptionArea" promptText="Brief description of the tier" 
+                             wrapText="true" prefRowCount="2"
+                             GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    
+                    <!-- Benefits -->
+                    <Label text="Benefits:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <TextArea fx:id="benefitsArea" promptText="List of benefits for this tier" 
+                             wrapText="true" prefRowCount="3"
+                             GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                </GridPane>
+                
+                <!-- Action Buttons -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button fx:id="addButton" text="Add Tier" onAction="#handleAdd" 
+                           styleClass="primary-button" prefWidth="100"/>
+                    <Button fx:id="updateButton" text="Update" onAction="#handleUpdate" 
+                           styleClass="primary-button" prefWidth="100"/>
+                    <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" 
+                           styleClass="danger-button" prefWidth="100"/>
+                    <Button fx:id="clearButton" text="Clear" onAction="#handleClear" 
+                           styleClass="secondary-button" prefWidth="100"/>
+                </HBox>
+            </VBox>
+        </SplitPane>
+    </center>
+    
+    <bottom>
+        <HBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="closeButton" text="Close" onAction="#handleClose" 
+                   styleClass="secondary-button" prefWidth="120"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

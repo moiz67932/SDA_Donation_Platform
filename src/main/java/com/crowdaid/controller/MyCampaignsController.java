@@ -12,7 +12,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -20,9 +22,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -46,6 +51,8 @@ public class MyCampaignsController {
     @FXML private Button viewDetailsButton;
     @FXML private Button editButton;
     @FXML private Button manageMilestonesButton;
+    @FXML private Button manageSubscriptionTiersButton;
+    @FXML private Button requestFundsButton;
     @FXML private Button logoutButton;
     
     public MyCampaignsController() {
@@ -158,6 +165,76 @@ public class MyCampaignsController {
             AlertUtil.showWarning("No Selection", "Please select a campaign to manage milestones.");
             return;
         }
+        
+        SessionManager.getInstance().setAttribute("selectedCampaign", selected);
+        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+            "/fxml/milestone_management.fxml", "CrowdAid - Manage Milestones");
+    }
+    
+    /**
+     * Handle manage subscription tiers button click.
+     */
+    @FXML
+    private void handleManageSubscriptionTiers(ActionEvent event) {
+        Campaign selected = campaignsTable.getSelectionModel().getSelectedItem();
+        
+        if (selected == null) {
+            AlertUtil.showWarning("No Selection", "Please select a campaign to manage subscription tiers.");
+            return;
+        }
+        
+        try {
+            // Load manage subscription tiers dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/manage_subscription_tiers.fxml"));
+            Scene scene = new Scene(loader.load());
+            
+            // Get controller and set campaign
+            ManageSubscriptionTiersController controller = loader.getController();
+            controller.setCampaign(selected);
+            
+            // Create and show dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Manage Subscription Tiers");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(scene);
+            dialogStage.showAndWait();
+            
+        } catch (IOException e) {
+            logger.error("Error opening manage subscription tiers dialog", e);
+            AlertUtil.showError("Error", "Failed to open subscription tier management: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Handle request fund release - triggers milestone voting for escrow campaigns.
+     */
+    @FXML
+    private void handleRequestFundRelease(ActionEvent event) {
+        Campaign selected = campaignsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtil.showWarning("No Selection", "Please select a campaign to request fund release.");
+            return;
+        }
+        
+        // Check if campaign uses escrow
+        if (!selected.isEscrowEnabled()) {
+            AlertUtil.showInfo("Not Applicable", 
+                "This campaign does not use escrow. Funds are released automatically upon donation.");
+            return;
+        }
+        
+        // Check if campaign is active
+        if (selected.getStatus() != CampaignStatus.ACTIVE) {
+            AlertUtil.showWarning("Campaign Not Active", 
+                "Funds can only be requested for active campaigns.");
+            return;
+        }
+        
+        // Navigate to milestone management where they can submit milestones for voting
+        AlertUtil.showInfo("Request Fund Release", 
+            "To release escrow funds, you need to submit a completed milestone for voting. \n\n" +
+            "Navigate to Milestone Management and mark milestones as completed, then submit them for donor voting. \n\n" +
+            "Once 60% of donors approve, the funds will be released.");
         
         SessionManager.getInstance().setAttribute("selectedCampaign", selected);
         viewLoader.loadView(viewLoader.getPrimaryStage(), 

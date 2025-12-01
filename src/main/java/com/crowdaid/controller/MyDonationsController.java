@@ -33,6 +33,7 @@ public class MyDonationsController {
     @FXML private TableColumn<DonationDisplay, LocalDateTime> dateColumn;
     @FXML private TableColumn<DonationDisplay, String> campaignColumn;
     @FXML private TableColumn<DonationDisplay, Double> amountColumn;
+    @FXML private TableColumn<DonationDisplay, String> donorNameColumn;
     @FXML private TableColumn<DonationDisplay, String> anonymousColumn;
     @FXML private TableColumn<DonationDisplay, String> messageColumn;
     @FXML private Label totalDonatedLabel;
@@ -60,6 +61,7 @@ public class MyDonationsController {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         campaignColumn.setCellValueFactory(new PropertyValueFactory<>("campaignTitle"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        donorNameColumn.setCellValueFactory(new PropertyValueFactory<>("donorName"));
         anonymousColumn.setCellValueFactory(new PropertyValueFactory<>("anonymous"));
         messageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
         
@@ -81,12 +83,16 @@ public class MyDonationsController {
             double total = 0.0;
             
             while (rs.next()) {
+                boolean isAnonymous = rs.getBoolean("is_anonymous");
+                String donorName = isAnonymous ? "Anonymous" : currentDonor.getName();
+                
                 DonationDisplay donation = new DonationDisplay(
                     rs.getLong("id"),
                     rs.getLong("campaign_id"),
                     rs.getString("campaign_title"),
                     rs.getDouble("amount"),
-                    rs.getBoolean("is_anonymous"),
+                    donorName,
+                    isAnonymous,
                     rs.getString("message"),
                     rs.getTimestamp("created_at").toLocalDateTime()
                 );
@@ -143,16 +149,18 @@ public class MyDonationsController {
         private final Long campaignId;
         private final String campaignTitle;
         private final Double amount;
+        private final String donorName;
         private final Boolean isAnonymous;
         private final String message;
         private final LocalDateTime createdAt;
         
         public DonationDisplay(Long id, Long campaignId, String campaignTitle, Double amount, 
-                             Boolean isAnonymous, String message, LocalDateTime createdAt) {
+                             String donorName, Boolean isAnonymous, String message, LocalDateTime createdAt) {
             this.id = id;
             this.campaignId = campaignId;
             this.campaignTitle = campaignTitle;
             this.amount = amount;
+            this.donorName = donorName;
             this.isAnonymous = isAnonymous;
             this.message = message;
             this.createdAt = createdAt;
@@ -162,6 +170,7 @@ public class MyDonationsController {
         public Long getCampaignId() { return campaignId; }
         public String getCampaignTitle() { return campaignTitle; }
         public Double getAmount() { return amount; }
+        public String getDonorName() { return donorName; }
         public String getAnonymous() { return isAnonymous ? "Yes" : "No"; }
         public String getMessage() { return message != null ? message : ""; }
         public LocalDateTime getCreatedAt() { return createdAt; }

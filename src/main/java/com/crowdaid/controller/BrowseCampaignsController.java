@@ -10,11 +10,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -38,6 +43,7 @@ public class BrowseCampaignsController {
     @FXML private TableColumn<Campaign, Double> collectedColumn;
     @FXML private TableColumn<Campaign, String> statusColumn;
     @FXML private Button viewDetailsButton;
+    @FXML private Button subscribeButton;
     @FXML private Button backButton;
     
     private ObservableList<Campaign> campaigns;
@@ -134,6 +140,43 @@ public class BrowseCampaignsController {
         
         viewLoader.loadView(viewLoader.getPrimaryStage(), 
             "/fxml/campaign_details.fxml", "CrowdAid - Campaign Details");
+    }
+    
+    /**
+     * Handle subscribe button click - opens subscription dialog.
+     */
+    @FXML
+    private void handleSubscribe(ActionEvent event) {
+        Campaign selected = campaignsTable.getSelectionModel().getSelectedItem();
+        
+        if (selected == null) {
+            AlertUtil.showWarning("No Selection", "Please select a campaign to subscribe.");
+            return;
+        }
+        
+        try {
+            // Load subscription dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/subscription_dialog.fxml"));
+            Scene scene = new Scene(loader.load());
+            
+            // Get controller and set campaign
+            SubscriptionDialogController controller = loader.getController();
+            controller.setCampaign(selected);
+            
+            // Create and show dialog
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Subscribe to Campaign");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(scene);
+            dialogStage.showAndWait();
+            
+            // Reload campaigns after subscription
+            loadCampaigns();
+            
+        } catch (IOException e) {
+            logger.error("Error opening subscription dialog", e);
+            AlertUtil.showError("Error", "Failed to open subscription dialog: " + e.getMessage());
+        }
     }
     
     /**

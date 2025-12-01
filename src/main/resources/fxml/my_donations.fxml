@@ -36,10 +36,11 @@
             <TableView fx:id="donationsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
-                    <TableColumn fx:id="campaignColumn" text="Campaign" prefWidth="250"/>
-                    <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
+                    <TableColumn fx:id="campaignColumn" text="Campaign" prefWidth="200"/>
+                    <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100"/>
+                    <TableColumn fx:id="donorNameColumn" text="Donor" prefWidth="150"/>
                     <TableColumn fx:id="anonymousColumn" text="Anonymous" prefWidth="100"/>
-                    <TableColumn fx:id="messageColumn" text="Message" prefWidth="200"/>
+                    <TableColumn fx:id="messageColumn" text="Message" prefWidth="150"/>
                 </columns>
             </TableView>
             

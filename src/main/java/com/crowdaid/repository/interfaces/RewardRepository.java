@@ -91,4 +91,14 @@ public interface RewardRepository {
      * @throws SQLException if database error occurs
      */
     boolean decrementStock(Long rewardId) throws SQLException;
+    
+    /**
+     * Decreases reward stock by specified quantity.
+     * 
+     * @param rewardId the reward ID
+     * @param quantity the quantity to decrease
+     * @return true if successful, false if insufficient stock
+     * @throws SQLException if database error occurs
+     */
+    boolean decreaseStock(Long rewardId, int quantity) throws SQLException;
 }

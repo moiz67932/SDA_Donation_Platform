@@ -28,9 +28,14 @@ public enum MilestoneStatus {
     REJECTED("Rejected"),
     
     /**
-     * Milestone is completed and funds released
+     * Milestone is completed (legacy status)
      */
-    COMPLETED("Completed");
+    COMPLETED("Completed"),
+    
+    /**
+     * Milestone funds have been released/withdrawn from escrow
+     */
+    RELEASED("Released");
     
     private final String displayName;
     

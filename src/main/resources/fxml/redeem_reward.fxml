@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.crowdaid.controller.RedeemRewardController"
+            stylesheets="@../css/styles.css"
+            prefWidth="550" prefHeight="500">
+    
+    <top>
+        <VBox alignment="CENTER" spacing="10" styleClass="header-section">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Redeem Reward" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+    
+    <center>
+        <VBox spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="20" right="40" bottom="20" left="40"/>
+            </padding>
+            
+            <VBox spacing="10" alignment="CENTER">
+                <Label fx:id="rewardNameLabel" text="Reward Name" styleClass="subtitle">
+                    <font>
+                        <Font name="System Bold" size="18"/>
+                    </font>
+                </Label>
+                <Label fx:id="rewardCategoryLabel" text="Category" styleClass="info-label"/>
+            </VBox>
+            
+            <Separator prefWidth="300"/>
+            
+            <VBox spacing="10">
+                <Label text="Description:" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="rewardDescriptionArea" editable="false" wrapText="true" 
+                         prefHeight="120" styleClass="readonly-text"/>
+            </VBox>
+            
+            <HBox spacing="15" alignment="CENTER">
+                <VBox alignment="CENTER" spacing="5">
+                    <Label text="Credit Cost:" styleClass="label-info"/>
+                    <Label fx:id="creditCostLabel" text="0" styleClass="amount-label">
+                        <font>
+                            <Font name="System Bold" size="22"/>
+                        </font>
+                    </Label>
+                </VBox>
+                
+                <Separator orientation="VERTICAL" prefHeight="50"/>
+                
+                <VBox alignment="CENTER" spacing="5">
+                    <Label text="Your Balance:" styleClass="label-info"/>
+                    <Label fx:id="currentBalanceLabel" text="0" styleClass="amount-label">
+                        <font>
+                            <Font name="System Bold" size="22"/>
+                        </font>
+                    </Label>
+                </VBox>
+            </HBox>
+            
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Stock Available:" styleClass="label-info"/>
+                <Label fx:id="stockLabel" text="0" styleClass="stock-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+    <bottom>
+        <HBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="redeemButton" text="Redeem Now" onAction="#handleRedeem" 
+                    styleClass="primary-button" prefWidth="130">
+                <font>
+                    <Font name="System Bold" size="14"/>
+                </font>
+            </Button>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" 
+                    styleClass="secondary-button" prefWidth="120"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

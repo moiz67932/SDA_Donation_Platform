@@ -15,6 +15,9 @@ public class Credit extends BaseEntity {
     
     private Long donorId;
     private double balance;
+    private int amount;
+    private String source;
+    private java.time.LocalDateTime earnedDate;
     
     /**
      * Default constructor initializing balance to zero.
@@ -65,6 +68,30 @@ public class Credit extends BaseEntity {
     
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+    
+    public int getAmount() {
+        return amount;
+    }
+    
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+    
+    public String getSource() {
+        return source;
+    }
+    
+    public void setSource(String source) {
+        this.source = source;
+    }
+    
+    public java.time.LocalDateTime getEarnedDate() {
+        return earnedDate;
+    }
+    
+    public void setEarnedDate(java.time.LocalDateTime earnedDate) {
+        this.earnedDate = earnedDate;
     }
     
     /**

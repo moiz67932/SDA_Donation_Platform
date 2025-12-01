@@ -3,6 +3,7 @@ package com.crowdaid.controller;
 import com.crowdaid.model.reward.Reward;
 import com.crowdaid.model.reward.RewardCategory;
 import com.crowdaid.model.reward.RewardStatus;
+import com.crowdaid.service.RewardService;
 import com.crowdaid.utils.AlertUtil;
 import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
@@ -11,7 +12,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,22 +23,19 @@ public class RewardManagementController {
     private static final Logger logger = LoggerFactory.getLogger(RewardManagementController.class);
     
     private final ViewLoader viewLoader;
+    private final RewardService rewardService;
     
     @FXML private TextField nameField;
     @FXML private TextArea descriptionArea;
     @FXML private ComboBox<RewardCategory> categoryComboBox;
     @FXML private TextField creditCostField;
     @FXML private TextField stockField;
-    @FXML private ComboBox<RewardStatus> statusComboBox;
-    @FXML private Button addButton;
-    @FXML private Button updateButton;
+    @FXML private CheckBox availableCheckBox;
+    @FXML private ListView<Reward> rewardListView;
+    @FXML private Button saveButton;
+    @FXML private Button clearButton;
+    @FXML private Button newRewardButton;
     @FXML private Button deleteButton;
-    @FXML private TableView<Reward> rewardsTable;
-    @FXML private TableColumn<Reward, String> nameColumn;
-    @FXML private TableColumn<Reward, String> categoryColumn;
-    @FXML private TableColumn<Reward, Integer> costColumn;
-    @FXML private TableColumn<Reward, Integer> stockColumn;
-    @FXML private TableColumn<Reward, String> statusColumn;
     @FXML private Button backButton;
     
     private ObservableList<Reward> rewards;
@@ -46,6 +43,7 @@ public class RewardManagementController {
     
     public RewardManagementController() {
         this.viewLoader = ViewLoader.getInstance();
+        this.rewardService = new RewardService();
         this.rewards = FXCollections.observableArrayList();
     }
     
@@ -55,20 +53,24 @@ public class RewardManagementController {
         
         // Setup combo boxes
         categoryComboBox.getItems().addAll(RewardCategory.values());
-        statusComboBox.getItems().addAll(RewardStatus.values());
-        statusComboBox.setValue(RewardStatus.AVAILABLE);
         
-        // Setup table columns
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        costColumn.setCellValueFactory(new PropertyValueFactory<>("creditCost"));
-        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        // Configure ListView with custom cell factory to display reward info
+        rewardListView.setCellFactory(param -> new ListCell<Reward>() {
+            @Override
+            protected void updateItem(Reward reward, boolean empty) {
+                super.updateItem(reward, empty);
+                if (empty || reward == null) {
+                    setText(null);
+                } else {
+                    setText(reward.getName() + " (" + reward.getCreditCost() + " credits)");
+                }
+            }
+        });
         
-        rewardsTable.setItems(rewards);
+        rewardListView.setItems(rewards);
         
         // Handle selection to populate form
-        rewardsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+        rewardListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedReward = newSelection;
                 populateForm(newSelection);
@@ -85,12 +87,12 @@ public class RewardManagementController {
      */
     private void loadRewards() {
         try {
-            // List<Reward> rewardList = rewardRepository.findAll();
-            // rewards.clear();
-            // rewards.addAll(rewardList);
+            rewards.clear();
+            rewards.addAll(rewardService.getAllRewards());
+            logger.info("Loaded {} rewards", rewards.size());
         } catch (Exception e) {
             logger.error("Error loading rewards", e);
-            AlertUtil.showError("Database Error", "Failed to load rewards.");
+            AlertUtil.showError("Database Error", "Failed to load rewards: " + e.getMessage());
         }
     }
     
@@ -103,7 +105,7 @@ public class RewardManagementController {
         categoryComboBox.setValue(reward.getCategory());
         creditCostField.setText(String.valueOf(reward.getCreditCost()));
         stockField.setText(String.valueOf(reward.getStock()));
-        statusComboBox.setValue(reward.getStatus());
+        availableCheckBox.setSelected(reward.getStatus() == RewardStatus.AVAILABLE);
     }
     
     /**
@@ -115,9 +117,29 @@ public class RewardManagementController {
         categoryComboBox.setValue(null);
         creditCostField.clear();
         stockField.clear();
-        statusComboBox.setValue(RewardStatus.AVAILABLE);
+        availableCheckBox.setSelected(true);
         selectedReward = null;
-        rewardsTable.getSelectionModel().clearSelection();
+        rewardListView.getSelectionModel().clearSelection();
+    }
+    
+    /**
+     * Handle clear button click.
+     */
+    @FXML
+    private void handleClear(ActionEvent event) {
+        clearForm();
+    }
+    
+    /**
+     * Handle save button click (creates new or updates existing).
+     */
+    @FXML
+    private void handleSave(ActionEvent event) {
+        if (selectedReward == null) {
+            handleAdd(event);
+        } else {
+            handleUpdate(event);
+        }
     }
     
     /**
@@ -126,7 +148,7 @@ public class RewardManagementController {
     @FXML
     private void handleAdd(ActionEvent event) {
         String name = nameField.getText();
-        descriptionArea.getText();
+        String description = descriptionArea.getText();
         RewardCategory category = categoryComboBox.getValue();
         
         if (name == null || name.trim().isEmpty()) {
@@ -140,11 +162,17 @@ public class RewardManagementController {
         }
         
         try {
-            Integer.parseInt(creditCostField.getText());
-            Integer.parseInt(stockField.getText());
-            statusComboBox.getValue();
+            double creditCost = Double.parseDouble(creditCostField.getText());
+            int stock = Integer.parseInt(stockField.getText());
             
-            // Reward reward = rewardService.createReward(name, description, category, creditCost, stock, status);
+            // Validate inputs are parsed successfully before proceeding
+            if (creditCost < 0 || stock < 0) {
+                AlertUtil.showError("Validation Error", "Credit cost and stock must be positive numbers.");
+                return;
+            }
+            
+            // Create and save reward
+            rewardService.createReward(name, description, category, creditCost, stock, null);
             
             AlertUtil.showSuccess("Reward Added", "The reward has been added successfully.");
             
@@ -153,6 +181,9 @@ public class RewardManagementController {
             
         } catch (NumberFormatException e) {
             AlertUtil.showError("Validation Error", "Please enter valid numbers for cost and stock.");
+        } catch (Exception e) {
+            logger.error("Error creating reward", e);
+            AlertUtil.showError("Error", "Failed to create reward: " + e.getMessage());
         }
     }
     
@@ -170,11 +201,11 @@ public class RewardManagementController {
             selectedReward.setName(nameField.getText());
             selectedReward.setDescription(descriptionArea.getText());
             selectedReward.setCategory(categoryComboBox.getValue());
-            selectedReward.setCreditCost(Integer.parseInt(creditCostField.getText()));
+            selectedReward.setCreditCost(Double.parseDouble(creditCostField.getText()));
             selectedReward.setStock(Integer.parseInt(stockField.getText()));
-            selectedReward.setStatus(statusComboBox.getValue());
+            selectedReward.setStatus(availableCheckBox.isSelected() ? RewardStatus.AVAILABLE : RewardStatus.DISABLED);
             
-            // rewardService.updateReward(selectedReward);
+            rewardService.updateReward(selectedReward);
             
             AlertUtil.showSuccess("Reward Updated", "The reward has been updated successfully.");
             
@@ -183,6 +214,9 @@ public class RewardManagementController {
             
         } catch (NumberFormatException e) {
             AlertUtil.showError("Validation Error", "Please enter valid numbers for cost and stock.");
+        } catch (Exception e) {
+            logger.error("Error updating reward", e);
+            AlertUtil.showError("Error", "Failed to update reward: " + e.getMessage());
         }
     }
     
@@ -200,12 +234,17 @@ public class RewardManagementController {
             "Are you sure you want to delete this reward?");
         
         if (confirmed) {
-            // rewardService.deleteReward(selectedReward.getId());
-            
-            AlertUtil.showSuccess("Reward Deleted", "The reward has been deleted.");
-            
-            clearForm();
-            loadRewards();
+            try {
+                rewardService.deleteReward(selectedReward.getId());
+                
+                AlertUtil.showSuccess("Reward Deleted", "The reward has been deleted.");
+                
+                clearForm();
+                loadRewards();
+            } catch (Exception e) {
+                logger.error("Error deleting reward", e);
+                AlertUtil.showError("Error", "Failed to delete reward: " + e.getMessage());
+            }
         }
     }
     

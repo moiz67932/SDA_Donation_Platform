@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.crowdaid.controller.VotingRequestsController"
+            stylesheets="@../css/styles.css">
+    
+    <top>
+        <VBox alignment="CENTER" spacing="10" styleClass="header-section">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Milestone Voting" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="28"/>
+                </font>
+            </Label>
+            <Label text="Review and vote on milestone completions" styleClass="subtitle"/>
+        </VBox>
+    </top>
+    
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <Label text="Milestones Awaiting Your Vote:" styleClass="section-label">
+                <font>
+                    <Font name="System Bold" size="16"/>
+                </font>
+            </Label>
+            
+            <TableView fx:id="votingRequestsTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="campaignColumn" text="Campaign" prefWidth="200"/>
+                    <TableColumn fx:id="milestoneColumn" text="Milestone" prefWidth="250"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="150"/>
+                    <TableColumn fx:id="deadlineColumn" text="Expected Date" prefWidth="170"/>
+                </columns>
+            </TableView>
+            
+            <VBox spacing="15" styleClass="details-section">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                
+                <Label text="Your Comment (Optional):" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="commentArea" wrapText="true" prefHeight="100" 
+                         promptText="Provide feedback on this milestone..."/>
+            </VBox>
+            
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="approveButton" text="✓ Approve" onAction="#handleApprove" 
+                        styleClass="success-button" prefWidth="130">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Button>
+                <Button fx:id="rejectButton" text="✗ Reject" onAction="#handleReject" 
+                        styleClass="danger-button" prefWidth="130">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Button>
+                <Button fx:id="backButton" text="Back to Dashboard" onAction="#handleBack" 
+                        styleClass="secondary-button" prefWidth="150"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+</BorderPane>

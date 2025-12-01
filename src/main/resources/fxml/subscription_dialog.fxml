@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.crowdaid.controller.SubscriptionDialogController"
+            stylesheets="@../css/styles.css"
+            prefWidth="600" prefHeight="500">
+    
+    <top>
+        <VBox alignment="CENTER" spacing="10" styleClass="header-section">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Subscribe to Campaign" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Label fx:id="campaignTitleLabel" text="Campaign Title" styleClass="subtitle">
+                <font>
+                    <Font size="16"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+    
+    <center>
+        <VBox spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="20" right="40" bottom="20" left="40"/>
+            </padding>
+            
+            <VBox spacing="10">
+                <Label text="Select Subscription Tier:" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <ListView fx:id="tierListView" prefHeight="200"/>
+            </VBox>
+            
+            <VBox spacing="10">
+                <Label text="Tier Benefits:" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="benefitsTextArea" editable="false" wrapText="true" prefHeight="100"/>
+            </VBox>
+            
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Monthly Amount:" styleClass="label-info"/>
+                <Label fx:id="monthlyAmountLabel" text="0.00" styleClass="amount-label">
+                    <font>
+                        <Font name="System Bold" size="18"/>
+                    </font>
+                </Label>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+    <bottom>
+        <HBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="subscribeButton" text="Subscribe" onAction="#handleSubscribe" 
+                    styleClass="primary-button" prefWidth="120"/>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" 
+                    styleClass="secondary-button" prefWidth="120"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

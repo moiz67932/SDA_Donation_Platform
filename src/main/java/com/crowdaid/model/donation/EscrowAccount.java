@@ -15,6 +15,9 @@ public class EscrowAccount extends BaseEntity {
     
     private Long campaignId;
     private double balance;
+    private double totalAmount;
+    private double availableAmount;
+    private double releasedAmount;
     
     /**
      * Default constructor.
@@ -63,6 +66,30 @@ public class EscrowAccount extends BaseEntity {
     
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+    
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+    
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+    
+    public double getAvailableAmount() {
+        return availableAmount;
+    }
+    
+    public void setAvailableAmount(double availableAmount) {
+        this.availableAmount = availableAmount;
+    }
+    
+    public double getReleasedAmount() {
+        return releasedAmount;
+    }
+    
+    public void setReleasedAmount(double releasedAmount) {
+        this.releasedAmount = releasedAmount;
     }
     
     /**

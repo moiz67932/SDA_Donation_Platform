@@ -2,6 +2,7 @@ package com.crowdaid.controller;
 
 import com.crowdaid.model.user.Donor;
 import com.crowdaid.model.user.User;
+import com.crowdaid.service.CreditService;
 import com.crowdaid.utils.AlertUtil;
 import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
@@ -21,6 +22,7 @@ public class DonorDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(DonorDashboardController.class);
     
     private final ViewLoader viewLoader;
+    private final CreditService creditService;
     private Donor currentDonor;
     
     @FXML private Label welcomeLabel;
@@ -31,6 +33,7 @@ public class DonorDashboardController {
     
     public DonorDashboardController() {
         this.viewLoader = ViewLoader.getInstance();
+        this.creditService = new CreditService();
     }
     
     @FXML
@@ -46,9 +49,39 @@ public class DonorDashboardController {
         currentDonor = (Donor) user;
         welcomeLabel.setText("Welcome, " + currentDonor.getName() + "!");
         
-        creditBalanceLabel.setText("Credits: 0");
+        loadCreditBalance();
+        
+        // Check if credits should be refreshed (after donation)
+        Boolean refreshCredits = (Boolean) SessionManager.getInstance().getAttribute("refreshCredits");
+        if (refreshCredits != null && refreshCredits) {
+            // Refresh credit balance
+            loadCreditBalance();
+            SessionManager.getInstance().removeAttribute("refreshCredits");
+        }
         
         logger.info("Donor dashboard loaded for user: {}", currentDonor.getEmail());
+    }
+    
+    /**
+     * Load and display the donor's credit balance.
+     */
+    private void loadCreditBalance() {
+        try {
+            int credits = creditService.getCreditBalance(currentDonor.getId());
+            creditBalanceLabel.setText("Credits: " + credits);
+            creditBalanceLabel.setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;"); // Green color
+            logger.debug("Credit balance loaded: {}", credits);
+        } catch (Exception e) {
+            logger.error("Error loading credit balance", e);
+            creditBalanceLabel.setText("Credits: 0");
+        }
+    }
+    
+    /**
+     * Public method to refresh credit balance (can be called from other controllers).
+     */
+    public void refreshCreditBalance() {
+        loadCreditBalance();
     }
     
     /**
@@ -67,6 +100,33 @@ public class DonorDashboardController {
     private void handleMyDonations(ActionEvent event) {
         viewLoader.loadView(viewLoader.getPrimaryStage(), 
             "/fxml/my_donations.fxml", "CrowdAid - My Donations");
+    }
+    
+    /**
+     * Navigate to my subscriptions screen (UC8).
+     */
+    @FXML
+    private void handleMySubscriptions(ActionEvent event) {
+        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+            "/fxml/my_subscriptions.fxml", "CrowdAid - My Subscriptions");
+    }
+    
+    /**
+     * Navigate to reward shop screen (UC10).
+     */
+    @FXML
+    private void handleRewardShop(ActionEvent event) {
+        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+            "/fxml/reward_shop.fxml", "CrowdAid - Reward Shop");
+    }
+    
+    /**
+     * Navigate to voting requests screen (UC9).
+     */
+    @FXML
+    private void handleVotingRequests(ActionEvent event) {
+        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+            "/fxml/voting_requests.fxml", "CrowdAid - Voting Requests");
     }
     
     /**

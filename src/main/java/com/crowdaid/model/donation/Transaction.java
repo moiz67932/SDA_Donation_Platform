@@ -102,6 +102,18 @@ public class Transaction extends BaseEntity {
         this.reference = reference;
     }
     
+    public void setGatewayId(Long gatewayId) {
+        this.reference = "Gateway-" + gatewayId;
+    }
+    
+    public void setPaymentMethod(String paymentMethod) {
+        this.description = paymentMethod;
+    }
+    
+    public void setTransactionDate(java.time.LocalDateTime transactionDate) {
+        // Transaction date is handled by BaseEntity timestamps
+    }
+    
     public String getDescription() {
         return description;
     }

@@ -102,4 +102,49 @@ public interface CampaignRepository {
      * @throws SQLException if database error occurs
      */
     void updateCollectedAmount(Long campaignId, double newAmount) throws SQLException;
+    
+    /**
+     * Finds campaigns by category.
+     * 
+     * @param category the campaign category
+     * @return list of campaigns in the category
+     * @throws SQLException if database error occurs
+     */
+    List<Campaign> findByCategory(CampaignCategory category) throws SQLException;
+    
+    /**
+     * Finds campaigns by keyword.
+     * 
+     * @param keyword the search keyword
+     * @return list of matching campaigns
+     * @throws SQLException if database error occurs
+     */
+    List<Campaign> searchByKeyword(String keyword) throws SQLException;
+    
+    /**
+     * Counts campaigns by status.
+     * 
+     * @param status the campaign status
+     * @return count of campaigns with the status
+     * @throws SQLException if database error occurs
+     */
+    int countByStatus(CampaignStatus status) throws SQLException;
+    
+    /**
+     * Counts active campaigns by campaigner.
+     * 
+     * @param campaignerId the campaigner's user ID
+     * @return count of active campaigns
+     * @throws SQLException if database error occurs
+     */
+    int countActiveByCampaigner(Long campaignerId) throws SQLException;
+    
+    /**
+     * Gets total raised amount by campaigner.
+     * 
+     * @param campaignerId the campaigner's user ID
+     * @return total collected amount
+     * @throws SQLException if database error occurs
+     */
+    double getTotalRaisedByCampaigner(Long campaignerId) throws SQLException;
 }

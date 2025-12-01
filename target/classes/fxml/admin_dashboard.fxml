@@ -65,6 +65,25 @@
                            styleClass="primary-button" prefWidth="150"/>
                 </VBox>
                 
+                <!-- Manage Reward Shop -->
+                <VBox alignment="CENTER" spacing="10" styleClass="dashboard-card" 
+                     GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    <Label text="🎁" styleClass="icon-label">
+                        <font><Font size="48"/></font>
+                    </Label>
+                    <Label text="Manage Reward Shop">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    <Label text="Configure rewards and redemptions" 
+                          wrapText="true" textAlignment="CENTER" maxWidth="200"/>
+                    <Button fx:id="manageRewardsButton" text="Manage" 
+                           onAction="#handleManageRewards" 
+                           styleClass="primary-button" prefWidth="150"/>
+                </VBox>
+                
             </GridPane>
             
         </VBox>

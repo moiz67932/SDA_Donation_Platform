@@ -11,10 +11,15 @@ import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -34,8 +39,11 @@ public class CreateCampaignController {
     @FXML private TextArea descriptionArea;
     @FXML private TextField goalAmountField;
     @FXML private DatePicker endDatePicker;
+    @FXML private CheckBox escrowEnabledCheckBox;
     @FXML private Button createButton;
     @FXML private Button cancelButton;
+    
+    private Campaign createdCampaign; // Store created campaign for tier management
     
     public CreateCampaignController() {
         this.viewLoader = ViewLoader.getInstance();
@@ -103,6 +111,7 @@ public class CreateCampaignController {
             campaign.setEndDate(endDate);
             campaign.setStartDate(LocalDate.now());
             campaign.setStatus(CampaignStatus.PENDING_REVIEW);
+            campaign.setEscrowEnabled(escrowEnabledCheckBox.isSelected());
             
             // Save campaign to database
             Campaign savedCampaign = campaignRepository.save(campaign);
@@ -111,11 +120,30 @@ public class CreateCampaignController {
                 logger.info("Campaign created successfully: id={}, title={}, campaigner={}", 
                            savedCampaign.getId(), savedCampaign.getTitle(), campaigner.getEmail());
                 
-                AlertUtil.showSuccess("Campaign Created", 
-                    "Your campaign has been created successfully and is pending admin approval.");
+                createdCampaign = savedCampaign;
                 
-                viewLoader.loadView(viewLoader.getPrimaryStage(), 
-                    "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+                // Ask if user wants to add subscription tiers
+                Alert confirmTiers = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmTiers.setTitle("Campaign Created Successfully");
+                confirmTiers.setHeaderText("Your campaign has been created and is pending admin approval.");
+                confirmTiers.setContentText("Would you like to add subscription tiers now? " +
+                        "This allows donors to subscribe with recurring monthly payments.\n\n" +
+                        "You can also add tiers later from 'My Campaigns'.");
+                
+                ButtonType yesButton = new ButtonType("Add Tiers Now", ButtonBar.ButtonData.YES);
+                ButtonType noButton = new ButtonType("Skip for Now", ButtonBar.ButtonData.NO);
+                confirmTiers.getButtonTypes().setAll(yesButton, noButton);
+                
+                confirmTiers.showAndWait().ifPresent(response -> {
+                    if (response == yesButton) {
+                        openTierManagementDialog(savedCampaign);
+                    } else {
+                        AlertUtil.showSuccess("Campaign Created", 
+                            "Your campaign has been created successfully and is pending admin approval.");
+                        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                            "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+                    }
+                });
             } else {
                 AlertUtil.showError("Error", "Failed to create campaign. Please try again.");
                 logger.error("Failed to create campaign: savedCampaign was null or had no ID");
@@ -140,5 +168,35 @@ public class CreateCampaignController {
     private void handleCancel(ActionEvent event) {
         viewLoader.loadView(viewLoader.getPrimaryStage(), 
             "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+    }
+    
+    /**
+     * Opens tier management dialog for the created campaign.
+     */
+    private void openTierManagementDialog(Campaign campaign) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/manage_subscription_tiers.fxml"));
+            Scene scene = new Scene(loader.load());
+            
+            ManageSubscriptionTiersController controller = loader.getController();
+            controller.setCampaign(campaign);
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add Subscription Tiers - " + campaign.getTitle());
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(scene);
+            dialogStage.setOnHidden(e -> {
+                // Return to dashboard after closing tier dialog
+                viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                    "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+            });
+            dialogStage.showAndWait();
+            
+        } catch (IOException e) {
+            logger.error("Error opening tier management dialog", e);
+            AlertUtil.showError("Error", "Failed to open tier management: " + e.getMessage());
+            viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+        }
     }
 }

@@ -161,6 +161,23 @@ public class MySQLUserRepository implements UserRepository {
         }
     }
     
+    @Override
+    public List<User> findAll() throws SQLException {
+        String sql = "SELECT * FROM users ORDER BY created_at DESC";
+        List<User> users = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+            return users;
+        }
+    }
+    
     /**
      * Maps a ResultSet row to a User object.
      * 
@@ -196,5 +213,21 @@ public class MySQLUserRepository implements UserRepository {
         user.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         
         return user;
+    }
+    
+    @Override
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
     }
 }

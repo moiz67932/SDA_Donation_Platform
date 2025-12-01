@@ -130,7 +130,7 @@ public class MySQLCampaignRepository implements CampaignRepository {
     
     @Override
     public List<Campaign> findCreditEarningCampaigns() throws SQLException {
-        String sql = "SELECT * FROM campaigns WHERE status = 'ACTIVE' AND (is_philanthropic = TRUE OR is_civic = TRUE) " +
+        String sql = "SELECT * FROM campaigns WHERE status = 'ACTIVE' AND (is_philanthropic = TRUE OR is_civic = TRUE OR is_reward_eligible = TRUE) " +
                      "ORDER BY created_at DESC";
         List<Campaign> campaigns = new ArrayList<>();
         
@@ -148,8 +148,8 @@ public class MySQLCampaignRepository implements CampaignRepository {
     @Override
     public Campaign save(Campaign campaign) throws SQLException {
         String sql = "INSERT INTO campaigns (campaigner_id, title, description, goal_amount, collected_amount, " +
-                     "category, status, start_date, end_date, is_philanthropic, is_civic, image_url, created_at, updated_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                     "category, status, start_date, end_date, is_philanthropic, is_civic, is_escrow_enabled, is_reward_eligible, image_url, created_at, updated_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -165,9 +165,11 @@ public class MySQLCampaignRepository implements CampaignRepository {
             stmt.setDate(9, campaign.getEndDate() != null ? Date.valueOf(campaign.getEndDate()) : null);
             stmt.setBoolean(10, campaign.isPhilanthropic());
             stmt.setBoolean(11, campaign.isCivic());
-            stmt.setString(12, campaign.getImageUrl());
-            stmt.setTimestamp(13, Timestamp.valueOf(campaign.getCreatedAt()));
-            stmt.setTimestamp(14, Timestamp.valueOf(campaign.getUpdatedAt()));
+            stmt.setBoolean(12, campaign.isEscrowEnabled());
+            stmt.setBoolean(13, campaign.isRewardEligible());
+            stmt.setString(14, campaign.getImageUrl());
+            stmt.setTimestamp(15, Timestamp.valueOf(campaign.getCreatedAt()));
+            stmt.setTimestamp(16, Timestamp.valueOf(campaign.getUpdatedAt()));
             
             int affectedRows = stmt.executeUpdate();
             
@@ -192,7 +194,7 @@ public class MySQLCampaignRepository implements CampaignRepository {
     public void update(Campaign campaign) throws SQLException {
         String sql = "UPDATE campaigns SET campaigner_id = ?, title = ?, description = ?, goal_amount = ?, " +
                      "collected_amount = ?, category = ?, status = ?, start_date = ?, end_date = ?, " +
-                     "is_philanthropic = ?, is_civic = ?, image_url = ?, updated_at = ? WHERE id = ?";
+                     "is_philanthropic = ?, is_civic = ?, is_escrow_enabled = ?, is_reward_eligible = ?, image_url = ?, updated_at = ? WHERE id = ?";
         
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -208,9 +210,11 @@ public class MySQLCampaignRepository implements CampaignRepository {
             stmt.setDate(9, campaign.getEndDate() != null ? Date.valueOf(campaign.getEndDate()) : null);
             stmt.setBoolean(10, campaign.isPhilanthropic());
             stmt.setBoolean(11, campaign.isCivic());
-            stmt.setString(12, campaign.getImageUrl());
-            stmt.setTimestamp(13, Timestamp.valueOf(campaign.getUpdatedAt()));
-            stmt.setLong(14, campaign.getId());
+            stmt.setBoolean(12, campaign.isEscrowEnabled());
+            stmt.setBoolean(13, campaign.isRewardEligible());
+            stmt.setString(14, campaign.getImageUrl());
+            stmt.setTimestamp(15, Timestamp.valueOf(campaign.getUpdatedAt()));
+            stmt.setLong(16, campaign.getId());
             
             stmt.executeUpdate();
             logger.info("Campaign updated: id={}", campaign.getId());
@@ -249,6 +253,45 @@ public class MySQLCampaignRepository implements CampaignRepository {
         }
     }
     
+    @Override
+    public List<Campaign> findByCategory(CampaignCategory category) throws SQLException {
+        String sql = "SELECT * FROM campaigns WHERE category = ? ORDER BY created_at DESC";
+        List<Campaign> campaigns = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, category.name());
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                campaigns.add(mapResultSetToCampaign(rs));
+            }
+            return campaigns;
+        }
+    }
+    
+    @Override
+    public List<Campaign> searchByKeyword(String keyword) throws SQLException {
+        String sql = "SELECT * FROM campaigns WHERE status = 'ACTIVE' AND (title LIKE ? OR description LIKE ?) " +
+                     "ORDER BY created_at DESC";
+        List<Campaign> campaigns = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                campaigns.add(mapResultSetToCampaign(rs));
+            }
+            return campaigns;
+        }
+    }
+    
     /**
      * Maps a ResultSet row to a Campaign object.
      * 
@@ -281,9 +324,74 @@ public class MySQLCampaignRepository implements CampaignRepository {
         campaign.setPhilanthropic(rs.getBoolean("is_philanthropic"));
         campaign.setCivic(rs.getBoolean("is_civic"));
         campaign.setImageUrl(rs.getString("image_url"));
+        
+        // Load escrow_enabled and reward_eligible fields
+        try {
+            campaign.setEscrowEnabled(rs.getBoolean("is_escrow_enabled"));
+        } catch (SQLException e) {
+            campaign.setEscrowEnabled(false);
+        }
+        
+        try {
+            campaign.setRewardEligible(rs.getBoolean("is_reward_eligible"));
+        } catch (SQLException e) {
+            campaign.setRewardEligible(false);
+        }
+        
         campaign.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         campaign.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         
         return campaign;
+    }
+    
+    @Override
+    public int countByStatus(CampaignStatus status) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM campaigns WHERE status = ?";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, status.name());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+    
+    @Override
+    public int countActiveByCampaigner(Long campaignerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM campaigns WHERE campaigner_id = ? AND status = 'ACTIVE'";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, campaignerId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+    
+    @Override
+    public double getTotalRaisedByCampaigner(Long campaignerId) throws SQLException {
+        String sql = "SELECT SUM(collected_amount) FROM campaigns WHERE campaigner_id = ?";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, campaignerId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+            return 0.0;
+        }
     }
 }

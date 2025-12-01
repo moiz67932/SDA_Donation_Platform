@@ -113,6 +113,19 @@ public class Validator {
     }
     
     /**
+     * Validates that an object is not null.
+     * 
+     * @param value the value to validate
+     * @param fieldName the field name for error messages
+     * @throws ValidationException if value is null
+     */
+    public static void validateNotNull(Object value, String fieldName) throws ValidationException {
+        if (value == null) {
+            throw new ValidationException(fieldName + " cannot be null");
+        }
+    }
+    
+    /**
      * Validates that a string length is within bounds.
      * 
      * @param value the value to validate

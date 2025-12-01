@@ -58,6 +58,9 @@
                 <Button fx:id="viewDetailsButton" text="View Details" 
                        onAction="#handleViewDetails" 
                        styleClass="primary-button" prefWidth="150"/>
+                <Button fx:id="subscribeButton" text="Subscribe" 
+                       onAction="#handleSubscribe" 
+                       styleClass="primary-button" prefWidth="150"/>
             </HBox>
             
         </VBox>

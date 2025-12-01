@@ -15,6 +15,7 @@ public class Donor extends User {
     
     private Credit credit;
     private Wallet wallet;
+    private double creditBalance;
     
     /**
      * Default constructor initializing role as DONOR.
@@ -59,10 +60,19 @@ public class Donor extends User {
     /**
      * Gets the donor's current credit balance.
      * 
-     * @return the credit balance, or 0 if credit is null
+     * @return the credit balance
      */
     public double getCreditBalance() {
-        return credit != null ? credit.getBalance() : 0.0;
+        return creditBalance;
+    }
+    
+    /**
+     * Sets the donor's credit balance.
+     * 
+     * @param creditBalance the new credit balance
+     */
+    public void setCreditBalance(double creditBalance) {
+        this.creditBalance = creditBalance;
     }
     
     /**

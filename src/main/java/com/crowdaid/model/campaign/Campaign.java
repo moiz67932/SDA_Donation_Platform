@@ -30,6 +30,8 @@ public class Campaign extends BaseEntity {
     private LocalDate endDate;
     private boolean philanthropic;
     private boolean civic;
+    private boolean escrowEnabled;
+    private boolean rewardEligible;
     private String imageUrl;
     
     private EscrowAccount escrowAccount;
@@ -174,6 +176,22 @@ public class Campaign extends BaseEntity {
         this.imageUrl = imageUrl;
     }
     
+    public boolean isEscrowEnabled() {
+        return escrowEnabled;
+    }
+    
+    public void setEscrowEnabled(boolean escrowEnabled) {
+        this.escrowEnabled = escrowEnabled;
+    }
+    
+    public boolean isRewardEligible() {
+        return rewardEligible;
+    }
+    
+    public void setRewardEligible(boolean rewardEligible) {
+        this.rewardEligible = rewardEligible;
+    }
+    
     public EscrowAccount getEscrowAccount() {
         return escrowAccount;
     }
@@ -227,12 +245,12 @@ public class Campaign extends BaseEntity {
     }
     
     /**
-     * Checks if donations earn credits (philanthropic or civic).
+     * Checks if donations earn credits (reward-eligible, philanthropic, or civic).
      * 
      * @return true if credits are earned
      */
     public boolean earnsCredits() {
-        return philanthropic || civic;
+        return rewardEligible || philanthropic || civic;
     }
     
     @Override

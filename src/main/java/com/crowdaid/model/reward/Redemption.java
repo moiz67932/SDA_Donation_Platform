@@ -82,6 +82,22 @@ public class Redemption extends BaseEntity {
         this.deliveryInfo = deliveryInfo;
     }
     
+    public void setCreditsUsed(double creditsUsed) {
+        this.creditsSpent = creditsUsed;
+    }
+    
+    public void setShippingAddress(String shippingAddress) {
+        this.deliveryInfo = shippingAddress;
+    }
+    
+    public void setTrackingNumber(String trackingNumber) {
+        if (this.deliveryInfo == null) {
+            this.deliveryInfo = "Tracking: " + trackingNumber;
+        } else {
+            this.deliveryInfo += "; Tracking: " + trackingNumber;
+        }
+    }
+    
     /**
      * Marks the redemption as completed.
      */

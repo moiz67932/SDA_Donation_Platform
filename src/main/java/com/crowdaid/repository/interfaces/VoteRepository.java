@@ -78,4 +78,13 @@ public interface VoteRepository {
      * @throws SQLException if database error occurs
      */
     double getApprovalPercentage(Long milestoneId) throws SQLException;
+    
+    /**
+     * Gets vote statistics for a milestone.
+     * 
+     * @param milestoneId the milestone ID
+     * @return map containing vote statistics
+     * @throws SQLException if database error occurs
+     */
+    Map<String, Object> getVoteStatistics(Long milestoneId) throws SQLException;
 }

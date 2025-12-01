@@ -13,6 +13,8 @@ CREATE TABLE users (
     phone VARCHAR(50),
     role ENUM('DONOR', 'CAMPAIGNER', 'ADMIN') NOT NULL,
     verified BOOLEAN DEFAULT FALSE,
+    total_withdrawn DECIMAL(15, 2) DEFAULT 0.00,
+    credit_balance DECIMAL(10, 2) DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
@@ -33,6 +35,8 @@ CREATE TABLE campaigns (
     end_date DATE,
     is_philanthropic BOOLEAN DEFAULT FALSE,
     is_civic BOOLEAN DEFAULT FALSE,
+    is_escrow_enabled BOOLEAN DEFAULT FALSE,
+    is_reward_eligible BOOLEAN DEFAULT FALSE,
     image_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -51,7 +55,10 @@ CREATE TABLE milestones (
     description TEXT,
     amount DECIMAL(15, 2) NOT NULL,
     expected_date DATE,
-    status ENUM('PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'COMPLETED') DEFAULT 'PENDING',
+    status ENUM('PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'COMPLETED', 'RELEASED') DEFAULT 'PENDING',
+    released_amount DECIMAL(15, 2) DEFAULT 0.00,
+    released_at TIMESTAMP NULL,
+    is_withdrawn BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
@@ -111,29 +118,55 @@ CREATE TABLE donations (
     INDEX idx_donor (donor_id)
 ) ENGINE=InnoDB;
 
+-- Subscription Tiers table
+CREATE TABLE subscription_tiers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id BIGINT NOT NULL,
+    tier_name VARCHAR(100) NOT NULL,
+    monthly_amount DECIMAL(15, 2) NOT NULL,
+    description TEXT,
+    benefits TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+    INDEX idx_campaign (campaign_id),
+    UNIQUE KEY unique_campaign_tier (campaign_id, tier_name)
+) ENGINE=InnoDB;
+
 -- Subscriptions table
 CREATE TABLE subscriptions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     campaign_id BIGINT NOT NULL,
     donor_id BIGINT NOT NULL,
+    tier_id BIGINT NOT NULL,
     tier_name VARCHAR(100) NOT NULL,
     monthly_amount DECIMAL(15, 2) NOT NULL,
     status ENUM('ACTIVE', 'PAUSED', 'CANCELLED', 'EXPIRED') DEFAULT 'ACTIVE',
+    start_date DATE NOT NULL,
+    next_billing_date DATE NOT NULL,
+    cancel_date DATE NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
     FOREIGN KEY (donor_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (tier_id) REFERENCES subscription_tiers(id) ON DELETE CASCADE,
     INDEX idx_campaign (campaign_id),
     INDEX idx_donor (donor_id),
-    INDEX idx_status (status)
+    INDEX idx_tier (tier_id),
+    INDEX idx_status (status),
+    INDEX idx_next_billing (next_billing_date),
+    UNIQUE KEY unique_donor_campaign (donor_id, campaign_id, status)
 ) ENGINE=InnoDB;
 
 -- Escrow Accounts table
 CREATE TABLE escrow_accounts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     campaign_id BIGINT NOT NULL UNIQUE,
-    balance DECIMAL(15, 2) DEFAULT 0.00,
+    total_amount DECIMAL(15, 2) DEFAULT 0.00,
+    available_amount DECIMAL(15, 2) DEFAULT 0.00,
+    released_amount DECIMAL(15, 2) DEFAULT 0.00,
+    last_withdrawal_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
@@ -209,7 +242,8 @@ CREATE TABLE redemptions (
     INDEX idx_status (status)
 ) ENGINE=InnoDB;
 
--- Credits table
+-- Credits table (deprecated - credit_balance moved to users table)
+-- Keeping for backward compatibility
 CREATE TABLE credits (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     donor_id BIGINT NOT NULL UNIQUE,
@@ -217,6 +251,20 @@ CREATE TABLE credits (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (donor_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_donor (donor_id)
+) ENGINE=InnoDB;
+
+-- Credit Transactions table (tracks credit earning and spending)
+CREATE TABLE credit_transactions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    donor_id BIGINT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    type ENUM('EARNED', 'SPENT', 'ADJUSTMENT') NOT NULL,
+    source VARCHAR(500),
+    reference_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (donor_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_donor (donor_id),
+    INDEX idx_type (type)
 ) ENGINE=InnoDB;
 
 -- Wallets table

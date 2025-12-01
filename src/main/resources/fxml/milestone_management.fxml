@@ -70,7 +70,7 @@
                 
                 <TableView fx:id="milestonesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                     <columns>
-                        <TableColumn fx:id="milestoneTitle Column" text="Title" prefWidth="200"/>
+                        <TableColumn fx:id="milestoneTitleColumn" text="Title" prefWidth="200"/>
                         <TableColumn fx:id="milestoneAmountColumn" text="Amount" prefWidth="100"/>
                         <TableColumn fx:id="milestoneExpectedDateColumn" text="Expected Date" prefWidth="120"/>
                         <TableColumn fx:id="milestoneStatusColumn" text="Status" prefWidth="120"/>
@@ -80,6 +80,12 @@
                 <HBox spacing="10" alignment="CENTER_RIGHT">
                     <Button fx:id="viewMilestoneButton" text="View Details" 
                            onAction="#handleViewMilestone" styleClass="primary-button"/>
+                    <Button fx:id="submitForVotingButton" text="Submit for Voting" 
+                           onAction="#handleSubmitForVoting" styleClass="success-button">
+                        <tooltip>
+                            <Tooltip text="Submit completed milestone for donor voting to release escrow funds"/>
+                        </tooltip>
+                    </Button>
                     <Button fx:id="deleteMilestoneButton" text="Delete" 
                            onAction="#handleDeleteMilestone" styleClass="secondary-button"/>
                 </HBox>

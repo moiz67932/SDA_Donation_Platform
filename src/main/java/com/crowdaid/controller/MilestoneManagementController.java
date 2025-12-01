@@ -51,6 +51,7 @@ public class MilestoneManagementController {
     @FXML private TableColumn<Milestone, LocalDate> milestoneExpectedDateColumn;
     @FXML private TableColumn<Milestone, MilestoneStatus> milestoneStatusColumn;
     @FXML private Button viewMilestoneButton;
+    @FXML private Button submitForVotingButton;
     @FXML private Button deleteMilestoneButton;
     
     private ObservableList<Milestone> milestonesList;
@@ -154,6 +155,26 @@ public class MilestoneManagementController {
                 return;
             }
             
+            // Validate that expected date is not after campaign end date
+            if (selectedCampaign.getEndDate() != null && expectedDate.isAfter(selectedCampaign.getEndDate())) {
+                AlertUtil.showError("Validation Error", 
+                    String.format("Milestone expected date (%s) cannot be after campaign end date (%s).",
+                                expectedDate, selectedCampaign.getEndDate()));
+                return;
+            }
+            
+            // Validate that milestone amount doesn't cause total to exceed campaign goal
+            double totalExistingAmount = milestonesList.stream()
+                .mapToDouble(Milestone::getAmount)
+                .sum();
+            
+            if (totalExistingAmount + amount > selectedCampaign.getGoalAmount()) {
+                AlertUtil.showError("Validation Error", 
+                    String.format("Total milestone amounts ($%.2f) would exceed campaign goal ($%.2f).",
+                                totalExistingAmount + amount, selectedCampaign.getGoalAmount()));
+                return;
+            }
+            
             // Create and save milestone
             Milestone milestone = new Milestone(selectedCampaign.getId(), title, description, amount, expectedDate);
             milestone.setStatus(MilestoneStatus.PENDING);
@@ -192,6 +213,62 @@ public class MilestoneManagementController {
         descriptionField.clear();
         amountField.clear();
         expectedDatePicker.setValue(null);
+    }
+    
+    /**
+     * Handle submit for voting button click (UC5: Submit Milestone for Voting).
+     */
+    @FXML
+    private void handleSubmitForVoting(ActionEvent event) {
+        Milestone selectedMilestone = milestonesTable.getSelectionModel().getSelectedItem();
+        
+        if (selectedMilestone == null) {
+            AlertUtil.showError("No Selection", "Please select a milestone to submit for voting.");
+            return;
+        }
+        
+        // Check if milestone is in a state that can be submitted
+        if (selectedMilestone.getStatus() != MilestoneStatus.PENDING && 
+            selectedMilestone.getStatus() != MilestoneStatus.REJECTED) {
+            AlertUtil.showWarning("Invalid Status", 
+                "Only pending or rejected milestones can be submitted for voting.\\nCurrent status: " + 
+                selectedMilestone.getStatus());
+            return;
+        }
+        
+        // Confirm submission
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Submit for Voting");
+        confirmAlert.setHeaderText("Submit Milestone for Donor Voting");
+        confirmAlert.setContentText(
+            "This will submit the milestone to donors for voting.\\n" +
+            "Donors who contributed to this campaign will be able to vote " +
+            "to approve or reject the milestone completion.\\n\\n" +
+            "Are you sure you want to proceed?");
+        
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // Update milestone status to UNDER_REVIEW
+                    selectedMilestone.setStatus(MilestoneStatus.UNDER_REVIEW);
+                    milestoneRepository.update(selectedMilestone);
+                    
+                    AlertUtil.showSuccess("Submitted for Voting", 
+                        "Milestone has been submitted for voting.\\n" +
+                        "Donors will now be able to vote on this milestone completion.");
+                    
+                    // Reload milestones
+                    loadMilestones();
+                    
+                    logger.info("Milestone submitted for voting: {} from campaign: {}", 
+                               selectedMilestone.getTitle(), selectedCampaign.getTitle());
+                    
+                } catch (SQLException e) {
+                    logger.error("Error submitting milestone for voting", e);
+                    AlertUtil.showError("Database Error", "Failed to submit milestone for voting.");
+                }
+            }
+        });
     }
     
     /**

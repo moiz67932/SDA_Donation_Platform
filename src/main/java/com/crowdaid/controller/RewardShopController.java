@@ -2,6 +2,10 @@ package com.crowdaid.controller;
 
 import com.crowdaid.model.reward.Reward;
 import com.crowdaid.model.reward.RewardCategory;
+import com.crowdaid.model.user.Donor;
+import com.crowdaid.model.user.User;
+import com.crowdaid.service.CreditService;
+import com.crowdaid.service.RewardService;
 import com.crowdaid.utils.AlertUtil;
 import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
@@ -22,6 +26,9 @@ public class RewardShopController {
     private static final Logger logger = LoggerFactory.getLogger(RewardShopController.class);
     
     private final ViewLoader viewLoader;
+    private final RewardService rewardService;
+    private final CreditService creditService;
+    private Donor currentDonor;
     
     @FXML private Label creditBalanceLabel;
     @FXML private ComboBox<RewardCategory> categoryFilterComboBox;
@@ -39,12 +46,22 @@ public class RewardShopController {
     
     public RewardShopController() {
         this.viewLoader = ViewLoader.getInstance();
+        this.rewardService = new RewardService();
+        this.creditService = new CreditService();
         this.rewards = FXCollections.observableArrayList();
     }
     
     @FXML
     private void initialize() {
-        SessionManager.getInstance().getCurrentUser();
+        User user = SessionManager.getInstance().getCurrentUser();
+        
+        if (user == null || !(user instanceof Donor)) {
+            AlertUtil.showError("Access Denied", "You must be logged in as a donor to access this page.");
+            viewLoader.loadView(viewLoader.getPrimaryStage(), "/fxml/login.fxml", "CrowdAid - Login");
+            return;
+        }
+        
+        currentDonor = (Donor) user;
         
         // Setup category filter
         categoryFilterComboBox.getItems().add(null); // "All Categories"
@@ -66,11 +83,32 @@ public class RewardShopController {
             }
         });
         
-        creditBalanceLabel.setText("Your Credits: 0");
-        
+        loadCreditBalance();
         loadRewards();
         
-        logger.info("Reward shop screen initialized");
+        logger.info("Reward shop screen initialized for donor: {}", currentDonor.getEmail());
+    }
+    
+    /**
+     * Load and display the donor's credit balance.
+     */
+    private void loadCreditBalance() {
+        try {
+            int credits = creditService.getCreditBalance(currentDonor.getId());
+            creditBalanceLabel.setText("Your Credits: " + credits);
+            creditBalanceLabel.setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;"); // Green color
+            logger.debug("Credit balance loaded: {}", credits);
+        } catch (Exception e) {
+            logger.error("Error loading credit balance", e);
+            creditBalanceLabel.setText("Your Credits: 0");
+        }
+    }
+    
+    /**
+     * Public method to refresh credit balance (can be called from other controllers).
+     */
+    public void refreshCreditBalance() {
+        loadCreditBalance();
     }
     
     /**
@@ -78,9 +116,10 @@ public class RewardShopController {
      */
     private void loadRewards() {
         try {
-            // List<Reward> rewardList = rewardRepository.findAllActive();
-            // rewards.clear();
-            // rewards.addAll(rewardList);
+            java.util.List<Reward> rewardList = rewardService.browseAvailableRewards();
+            rewards.clear();
+            rewards.addAll(rewardList);
+            logger.info("Loaded {} available rewards", rewardList.size());
         } catch (Exception e) {
             logger.error("Error loading rewards", e);
             AlertUtil.showError("Database Error", "Failed to load rewards.");
@@ -92,7 +131,23 @@ public class RewardShopController {
      */
     @FXML
     private void handleCategoryFilter(ActionEvent event) {
-        categoryFilterComboBox.getValue();
+        RewardCategory selectedCategory = categoryFilterComboBox.getValue();
+        
+        try {
+            if (selectedCategory == null) {
+                // Load all rewards
+                loadRewards();
+            } else {
+                // Filter by category
+                java.util.List<Reward> rewardList = rewardService.getRewardsByCategory(selectedCategory);
+                rewards.clear();
+                rewards.addAll(rewardList);
+                logger.info("Filtered {} rewards for category {}", rewardList.size(), selectedCategory);
+            }
+        } catch (Exception e) {
+            logger.error("Error filtering rewards", e);
+            AlertUtil.showError("Error", "Failed to filter rewards.");
+        }
     }
     
     /**
@@ -107,14 +162,40 @@ public class RewardShopController {
             return;
         }
         
-        boolean confirmed = AlertUtil.showConfirmation("Confirm Redemption", 
-            String.format("Redeem %s for %d credits?", selected.getName(), selected.getCreditCost()));
-        
-        if (confirmed) {
-            // rewardService.redeemReward(donor, selected);
+        try {
+            // Check if donor has enough credits
+            int currentCredits = creditService.getCreditBalance(currentDonor.getId());
+            int requiredCredits = (int) selected.getCreditCost();
             
-            AlertUtil.showSuccess("Redemption Successful", 
-                "Your reward has been redeemed successfully!");
+            if (currentCredits < requiredCredits) {
+                AlertUtil.showWarning("Insufficient Credits", 
+                    String.format("You need %d credits but only have %d credits.", 
+                                 requiredCredits, currentCredits));
+                return;
+            }
+            
+            // Confirm redemption
+            boolean confirmed = AlertUtil.showConfirmation("Confirm Redemption", 
+                String.format("Redeem %s for %d credits?", selected.getName(), requiredCredits));
+            
+            if (confirmed) {
+                // Redeem the reward
+                rewardService.redeemReward(selected.getId(), currentDonor.getId(), "To be provided");
+                
+                // Refresh credit balance and rewards list
+                loadCreditBalance();
+                loadRewards();
+                
+                AlertUtil.showSuccess("Redemption Successful", 
+                    String.format("You have successfully redeemed %s! Your remaining credits: %d", 
+                                 selected.getName(), currentCredits - requiredCredits));
+                
+                logger.info("Donor {} successfully redeemed reward {} for {} credits", 
+                           currentDonor.getId(), selected.getName(), requiredCredits);
+            }
+        } catch (Exception e) {
+            logger.error("Error redeeming reward", e);
+            AlertUtil.showError("Redemption Failed", "Failed to redeem reward: " + e.getMessage());
         }
     }
     

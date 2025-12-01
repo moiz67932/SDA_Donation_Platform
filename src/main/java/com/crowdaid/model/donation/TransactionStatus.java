@@ -18,6 +18,11 @@ public enum TransactionStatus {
     SUCCESS("Success"),
     
     /**
+     * Transaction completed (alias for SUCCESS)
+     */
+    COMPLETED("Completed"),
+    
+    /**
      * Transaction failed
      */
     FAILED("Failed"),

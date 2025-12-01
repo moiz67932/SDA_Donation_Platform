@@ -174,4 +174,37 @@ public class MySQLDonationRepository implements DonationRepository {
         
         return donation;
     }
+    
+    @Override
+    public double getTotalDonationAmount() throws SQLException {
+        String sql = "SELECT COALESCE(SUM(amount), 0) as total FROM donations";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+            return 0.0;
+        }
+    }
+    
+    @Override
+    public int getUniqueDonorCount(Long campaignId) throws SQLException {
+        String sql = "SELECT COUNT(DISTINCT donor_id) as count FROM donations WHERE campaign_id = ?";
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, campaignId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+            return 0;
+        }
+    }
 }

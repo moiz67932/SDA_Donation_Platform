@@ -20,6 +20,8 @@ public abstract class User extends BaseEntity {
     protected String phone;
     protected Role role;
     protected boolean verified;
+    protected double totalWithdrawn;
+    protected double creditBalance;
     
     /**
      * Default constructor.
@@ -98,6 +100,31 @@ public abstract class User extends BaseEntity {
     
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+    
+    public double getTotalWithdrawn() {
+        return totalWithdrawn;
+    }
+    
+    public void setTotalWithdrawn(double totalWithdrawn) {
+        this.totalWithdrawn = totalWithdrawn;
+    }
+    
+    public double getCreditBalance() {
+        return creditBalance;
+    }
+    
+    public void setCreditBalance(double creditBalance) {
+        this.creditBalance = creditBalance;
+    }
+    
+    /**
+     * Gets the user's full name.
+     * 
+     * @return the user's name
+     */
+    public String getFullName() {
+        return name;
     }
     
     @Override

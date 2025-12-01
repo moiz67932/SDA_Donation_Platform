@@ -52,6 +52,10 @@
                        onAction="#handleEdit" styleClass="secondary-button"/>
                 <Button fx:id="manageMilestonesButton" text="Manage Milestones" 
                        onAction="#handleManageMilestones" styleClass="accent-button"/>
+                <Button fx:id="manageSubscriptionTiersButton" text="Manage Subscription Tiers" 
+                       onAction="#handleManageSubscriptionTiers" styleClass="primary-button"/>
+                <Button fx:id="requestFundsButton" text="Request Fund Release" 
+                       onAction="#handleRequestFundRelease" styleClass="success-button"/>
             </HBox>
             
         </VBox>

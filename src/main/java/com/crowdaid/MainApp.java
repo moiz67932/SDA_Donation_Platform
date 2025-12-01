@@ -1,5 +1,6 @@
 package com.crowdaid;
 
+import com.crowdaid.service.BootstrapService;
 import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
 import javafx.application.Application;
@@ -30,6 +31,20 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) {
         try {
+            // Initialize database with seed data
+            logger.info("Initializing database...");
+            BootstrapService bootstrapService = new BootstrapService();
+            
+            // Test database connection
+            if (!bootstrapService.testConnection()) {
+                logger.error("Database connection failed!");
+                showErrorAndExit("Database connection failed. Please check your database configuration.");
+                return;
+            }
+            
+            // Run bootstrap to create admin and sample data
+            bootstrapService.initialize();
+            
             primaryStage = stage;
             primaryStage.setTitle("CrowdAid - Online Fundraising Platform");
             
@@ -44,11 +59,28 @@ public class MainApp extends Application {
             primaryStage.show();
             
             logger.info("CrowdAid application started successfully");
+            logger.info("Default admin credentials: admin@crowdaid.com / admin123");
             
         } catch (Exception e) {
             logger.error("Failed to start application", e);
             e.printStackTrace();
+            showErrorAndExit("Failed to start application: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Shows error dialog and exits application.
+     * 
+     * @param message the error message
+     */
+    private void showErrorAndExit(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle("Startup Error");
+        alert.setHeaderText("Failed to start CrowdAid");
+        alert.setContentText(message);
+        alert.showAndWait();
+        System.exit(1);
     }
     
     /**

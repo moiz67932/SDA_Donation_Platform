@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.crowdaid.controller.SubmitMilestoneController"
+            stylesheets="@../css/styles.css">
+    
+    <top>
+        <VBox alignment="CENTER" spacing="10" styleClass="header-section">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Submit Milestone Completion" styleClass="page-title">
+                <font>
+                    <Font name="System Bold" size="26"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+    
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <VBox spacing="20">
+                <padding>
+                    <Insets top="20" right="40" bottom="20" left="40"/>
+                </padding>
+                
+                <VBox spacing="10">
+                    <Label text="Select Milestone:" styleClass="section-label">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    <ComboBox fx:id="milestoneComboBox" prefWidth="400" promptText="Choose a milestone..."/>
+                </VBox>
+                
+                <VBox spacing="10">
+                    <Label text="Milestone Details:" styleClass="section-label">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    <TextArea fx:id="milestoneDetailsArea" editable="false" wrapText="true" prefHeight="80"/>
+                </VBox>
+                
+                <Separator/>
+                
+                <VBox spacing="10">
+                    <Label text="Completion Description:" styleClass="section-label">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    <TextArea fx:id="completionDescriptionArea" wrapText="true" prefHeight="120" 
+                             promptText="Describe how you completed this milestone..."/>
+                </VBox>
+                
+                <VBox spacing="10">
+                    <Label text="Upload Evidence:" styleClass="section-label">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    <Label text="(Simulated file uploads - enter file paths)" styleClass="info-label"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="evidence1Field" prefWidth="300" 
+                                  promptText="Evidence file path 1 (e.g., /images/receipt1.jpg)"/>
+                        <Button text="Add" onAction="#handleAddEvidence1" styleClass="secondary-button"/>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="evidence2Field" prefWidth="300" 
+                                  promptText="Evidence file path 2 (optional)"/>
+                        <Button text="Add" onAction="#handleAddEvidence2" styleClass="secondary-button"/>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="evidence3Field" prefWidth="300" 
+                                  promptText="Evidence file path 3 (optional)"/>
+                        <Button text="Add" onAction="#handleAddEvidence3" styleClass="secondary-button"/>
+                    </HBox>
+                    
+                    <ListView fx:id="evidenceListView" prefHeight="100"/>
+                </VBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+    <bottom>
+        <HBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="submitButton" text="Submit for Voting" onAction="#handleSubmit" 
+                    styleClass="primary-button" prefWidth="150">
+                <font>
+                    <Font name="System Bold" size="14"/>
+                </font>
+            </Button>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" 
+                    styleClass="secondary-button" prefWidth="120"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

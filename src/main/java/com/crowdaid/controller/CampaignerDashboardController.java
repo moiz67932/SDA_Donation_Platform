@@ -2,6 +2,8 @@ package com.crowdaid.controller;
 
 import com.crowdaid.model.user.Campaigner;
 import com.crowdaid.model.user.User;
+import com.crowdaid.repository.interfaces.CampaignRepository;
+import com.crowdaid.repository.mysql.MySQLCampaignRepository;
 import com.crowdaid.utils.AlertUtil;
 import com.crowdaid.utils.SessionManager;
 import com.crowdaid.utils.ViewLoader;
@@ -21,6 +23,7 @@ public class CampaignerDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(CampaignerDashboardController.class);
     
     private final ViewLoader viewLoader;
+    private final CampaignRepository campaignRepository;
     private Campaigner currentCampaigner;
     
     @FXML private Label welcomeLabel;
@@ -31,6 +34,7 @@ public class CampaignerDashboardController {
     
     public CampaignerDashboardController() {
         this.viewLoader = ViewLoader.getInstance();
+        this.campaignRepository = new MySQLCampaignRepository();
     }
     
     @FXML
@@ -46,7 +50,7 @@ public class CampaignerDashboardController {
         currentCampaigner = (Campaigner) user;
         welcomeLabel.setText("Welcome, " + currentCampaigner.getName() + "!");
         
-        statsLabel.setText("Active Campaigns: 0 | Total Raised: $0.00");
+        loadStatistics();
         
         logger.info("Campaigner dashboard loaded for user: {}", currentCampaigner.getEmail());
     }
@@ -77,5 +81,24 @@ public class CampaignerDashboardController {
         SessionManager.getInstance().clear();
         logger.info("Campaigner logged out: {}", currentCampaigner.getEmail());
         viewLoader.loadView(viewLoader.getPrimaryStage(), "/fxml/login.fxml", "CrowdAid - Login");
+    }
+    
+    /**
+     * Load campaigner statistics.
+     */
+    private void loadStatistics() {
+        try {
+            int activeCampaigns = campaignRepository.countActiveByCampaigner(currentCampaigner.getId());
+            double totalRaised = campaignRepository.getTotalRaisedByCampaigner(currentCampaigner.getId());
+            
+            statsLabel.setText(String.format("Active Campaigns: %d | Total Raised: $%.2f",
+                                           activeCampaigns, totalRaised));
+            
+            logger.debug("Campaigner statistics loaded: campaigns={}, raised=${}",
+                        activeCampaigns, totalRaised);
+        } catch (Exception e) {
+            logger.error("Error loading campaigner statistics", e);
+            statsLabel.setText("Statistics unavailable");
+        }
     }
 }

@@ -14,6 +14,7 @@ public class Campaigner extends User {
     
     private BankInfo bankInfo;
     private Wallet wallet;
+    private double totalWithdrawn;
     
     /**
      * Default constructor initializing role as CAMPAIGNER.
@@ -62,6 +63,24 @@ public class Campaigner extends User {
      */
     public double getWalletBalance() {
         return wallet != null ? wallet.getBalance() : 0.0;
+    }
+    
+    /**
+     * Gets the total amount withdrawn from escrow across all campaigns.
+     * 
+     * @return the total withdrawn amount
+     */
+    public double getTotalWithdrawn() {
+        return totalWithdrawn;
+    }
+    
+    /**
+     * Sets the total amount withdrawn from escrow.
+     * 
+     * @param totalWithdrawn the total withdrawn amount
+     */
+    public void setTotalWithdrawn(double totalWithdrawn) {
+        this.totalWithdrawn = totalWithdrawn;
     }
     
     @Override

@@ -3,6 +3,7 @@ package com.crowdaid.model.campaign;
 import com.crowdaid.model.common.BaseEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,9 @@ public class Milestone extends BaseEntity {
     private double amount;
     private LocalDate expectedDate;
     private MilestoneStatus status;
+    private double releasedAmount;
+    private LocalDateTime releasedAt;
+    private boolean withdrawn;
     private List<Evidence> evidenceList;
     private VotingPeriod votingPeriod;
     
@@ -99,6 +103,10 @@ public class Milestone extends BaseEntity {
         this.amount = amount;
     }
     
+    public double getFundAmount() {
+        return amount;
+    }
+    
     public LocalDate getExpectedDate() {
         return expectedDate;
     }
@@ -129,6 +137,30 @@ public class Milestone extends BaseEntity {
     
     public void setVotingPeriod(VotingPeriod votingPeriod) {
         this.votingPeriod = votingPeriod;
+    }
+    
+    public double getReleasedAmount() {
+        return releasedAmount;
+    }
+    
+    public void setReleasedAmount(double releasedAmount) {
+        this.releasedAmount = releasedAmount;
+    }
+    
+    public LocalDateTime getReleasedAt() {
+        return releasedAt;
+    }
+    
+    public void setReleasedAt(LocalDateTime releasedAt) {
+        this.releasedAt = releasedAt;
+    }
+    
+    public boolean isWithdrawn() {
+        return withdrawn;
+    }
+    
+    public void setWithdrawn(boolean withdrawn) {
+        this.withdrawn = withdrawn;
     }
     
     /**

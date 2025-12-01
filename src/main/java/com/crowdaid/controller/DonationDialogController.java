@@ -3,10 +3,7 @@ package com.crowdaid.controller;
 import com.crowdaid.model.campaign.Campaign;
 import com.crowdaid.model.donation.Donation;
 import com.crowdaid.model.user.Donor;
-import com.crowdaid.repository.interfaces.CampaignRepository;
-import com.crowdaid.repository.interfaces.DonationRepository;
-import com.crowdaid.repository.mysql.MySQLCampaignRepository;
-import com.crowdaid.repository.mysql.MySQLDonationRepository;
+import com.crowdaid.service.DonationService;
 import com.crowdaid.utils.AlertUtil;
 import com.crowdaid.utils.SessionManager;
 import javafx.event.ActionEvent;
@@ -16,18 +13,15 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
 /**
  * Controller for donation dialog (UC7: Make One-Time Donation).
+ * Updated to use DonationService which handles credit awarding for COMMUNITY category donations.
  */
 public class DonationDialogController {
     
     private static final Logger logger = LoggerFactory.getLogger(DonationDialogController.class);
     
-    private final DonationRepository donationRepository;
-    private final CampaignRepository campaignRepository;
+    private final DonationService donationService;
     private Campaign campaign;
     private Donor donor;
     
@@ -39,8 +33,7 @@ public class DonationDialogController {
     @FXML private Button cancelButton;
     
     public DonationDialogController() {
-        this.donationRepository = new MySQLDonationRepository();
-        this.campaignRepository = new MySQLCampaignRepository();
+        this.donationService = new DonationService();
     }
     
     @FXML
@@ -91,40 +84,46 @@ public class DonationDialogController {
             boolean anonymous = anonymousCheckBox.isSelected();
             String message = messageArea.getText();
             
-            // Create donation
-            Donation donation = new Donation();
-            donation.setCampaignId(campaign.getId());
-            donation.setDonorId(donor.getId());
-            donation.setAmount(amount);
-            donation.setAnonymous(anonymous);
-            donation.setMessage(message);
-            donation.setTransactionReference("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-            
-            // Save donation
-            Donation savedDonation = donationRepository.save(donation);
-            
-            // Update campaign collected amount
-            double newCollectedAmount = campaign.getCollectedAmount() + amount;
-            campaignRepository.updateCollectedAmount(campaign.getId(), newCollectedAmount);
+            // Process donation through DonationService (handles credit awarding for COMMUNITY campaigns)
+            Donation savedDonation = donationService.makeDonation(
+                campaign.getId(), 
+                donor.getId(), 
+                amount, 
+                anonymous, 
+                message
+            );
             
             logger.info("Donation successful: amount={}, campaign={}, donor={}, anonymous={}", 
                        amount, campaign.getTitle(), donor.getEmail(), anonymous);
             
-            AlertUtil.showSuccess("Donation Successful", 
-                String.format("Thank you for donating $%.2f to %s!\\nTransaction: %s", 
-                             amount, campaign.getTitle(), savedDonation.getTransactionReference()));
+            // Show success message with transaction reference
+            String successMessage = String.format(
+                "Thank you for donating $%.2f to %s!\nTransaction: %s", 
+                amount, campaign.getTitle(), savedDonation.getTransactionReference()
+            );
+            
+            // Add credit info for COMMUNITY category donations
+            if (campaign.getCategory() == com.crowdaid.model.campaign.CampaignCategory.COMMUNITY) {
+                int creditsEarned = (int) Math.floor(amount / 100.0);
+                if (creditsEarned > 0) {
+                    successMessage += String.format("\n\nYou earned %d credit%s for this donation!", 
+                        creditsEarned, creditsEarned > 1 ? "s" : "");
+                }
+            }
+            
+            AlertUtil.showSuccess("Donation Successful", successMessage);
+            
+            // Signal that credits should be refreshed on dashboard
+            SessionManager.getInstance().setAttribute("refreshCredits", true);
             
             closeDialog();
             
         } catch (NumberFormatException e) {
             AlertUtil.showError("Invalid Amount", "Please enter a valid donation amount (numbers only).");
             logger.warn("Invalid donation amount entered: {}", amountText);
-        } catch (SQLException e) {
-            AlertUtil.showError("Database Error", "Failed to process donation: " + e.getMessage());
-            logger.error("Error processing donation", e);
         } catch (Exception e) {
-            AlertUtil.showError("Error", "An unexpected error occurred: " + e.getMessage());
-            logger.error("Unexpected error during donation", e);
+            AlertUtil.showError("Error", "Failed to process donation: " + e.getMessage());
+            logger.error("Error processing donation", e);
         }
     }
     

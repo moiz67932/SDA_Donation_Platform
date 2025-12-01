@@ -111,6 +111,23 @@ public class Reward extends BaseEntity {
         this.imagePath = imagePath;
     }
     
+    public int getStockQuantity() {
+        return stock;
+    }
+    
+    public void setStockQuantity(int stockQuantity) {
+        this.stock = stockQuantity;
+        if (stockQuantity <= 0) {
+            this.status = RewardStatus.OUT_OF_STOCK;
+        } else if (this.status == RewardStatus.OUT_OF_STOCK) {
+            this.status = RewardStatus.AVAILABLE;
+        }
+    }
+    
+    public void setImageUrl(String imageUrl) {
+        this.imagePath = imageUrl;
+    }
+    
     /**
      * Checks if the reward is available for redemption.
      * 

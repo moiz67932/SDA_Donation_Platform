@@ -74,4 +74,20 @@ public interface UserRepository {
      * @throws SQLException if database error occurs
      */
     boolean emailExists(String email) throws SQLException;
+    
+    /**
+     * Finds all users.
+     * 
+     * @return list of all users
+     * @throws SQLException if database error occurs
+     */
+    List<User> findAll() throws SQLException;
+    
+    /**
+     * Counts all users.
+     * 
+     * @return total count of users
+     * @throws SQLException if database error occurs
+     */
+    int countAll() throws SQLException;
 }

@@ -2,6 +2,7 @@ package com.crowdaid.controller;
 
 import com.crowdaid.model.campaign.Campaign;
 import com.crowdaid.model.user.Donor;
+import com.crowdaid.model.user.User;
 import com.crowdaid.repository.interfaces.CampaignRepository;
 import com.crowdaid.repository.mysql.MySQLCampaignRepository;
 import com.crowdaid.utils.AlertUtil;
@@ -133,7 +134,31 @@ public class CampaignDetailsController {
      */
     @FXML
     private void handleBack(ActionEvent event) {
-        viewLoader.loadView(viewLoader.getPrimaryStage(), 
-            "/fxml/browse_campaigns.fxml", "CrowdAid - Browse Campaigns");
+        // Navigate back to appropriate dashboard based on user role
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        
+        if (currentUser == null) {
+            viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                "/fxml/login.fxml", "CrowdAid - Login");
+            return;
+        }
+        
+        switch (currentUser.getRole()) {
+            case DONOR:
+                viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                    "/fxml/donor_dashboard.fxml", "CrowdAid - Donor Dashboard");
+                break;
+            case CAMPAIGNER:
+                viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                    "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");
+                break;
+            case ADMIN:
+                viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                    "/fxml/admin_dashboard.fxml", "CrowdAid - Admin Dashboard");
+                break;
+            default:
+                viewLoader.loadView(viewLoader.getPrimaryStage(), 
+                    "/fxml/browse_campaigns.fxml", "CrowdAid - Browse Campaigns");
+        }
     }
 }

@@ -18,10 +18,15 @@ public class Subscription extends BaseEntity {
     private Campaign campaign;
     private Long donorId;
     private Donor donor;
+    private Long tierId;
+    private SubscriptionTier tier;
     private String tierName;
     private double monthlyAmount;
     private SubscriptionStatus status;
     private String description;
+    private java.time.LocalDate startDate;
+    private java.time.LocalDate nextBillingDate;
+    private java.time.LocalDate cancelDate;
     
     /**
      * Default constructor.
@@ -29,10 +34,30 @@ public class Subscription extends BaseEntity {
     public Subscription() {
         super();
         this.status = SubscriptionStatus.ACTIVE;
+        this.startDate = java.time.LocalDate.now();
+        this.nextBillingDate = this.startDate.plusMonths(1);
     }
     
     /**
      * Constructor with essential fields.
+     * 
+     * @param campaignId the campaign ID
+     * @param donorId the donor's user ID
+     * @param tierId the subscription tier ID
+     * @param tierName the subscription tier name
+     * @param monthlyAmount the monthly subscription amount
+     */
+    public Subscription(Long campaignId, Long donorId, Long tierId, String tierName, double monthlyAmount) {
+        this();
+        this.campaignId = campaignId;
+        this.donorId = donorId;
+        this.tierId = tierId;
+        this.tierName = tierName;
+        this.monthlyAmount = monthlyAmount;
+    }
+    
+    /**
+     * Constructor for legacy support.
      * 
      * @param campaignId the campaign ID
      * @param donorId the donor's user ID
@@ -87,6 +112,27 @@ public class Subscription extends BaseEntity {
         }
     }
     
+    public Long getTierId() {
+        return tierId;
+    }
+    
+    public void setTierId(Long tierId) {
+        this.tierId = tierId;
+    }
+    
+    public SubscriptionTier getTier() {
+        return tier;
+    }
+    
+    public void setTier(SubscriptionTier tier) {
+        this.tier = tier;
+        if (tier != null) {
+            this.tierId = tier.getId();
+            this.tierName = tier.getTierName();
+            this.monthlyAmount = tier.getMonthlyAmount();
+        }
+    }
+    
     public String getTierName() {
         return tierName;
     }
@@ -101,6 +147,22 @@ public class Subscription extends BaseEntity {
     
     public void setMonthlyAmount(double monthlyAmount) {
         this.monthlyAmount = monthlyAmount;
+    }
+    
+    /**
+     * Gets amount (alias for monthlyAmount for compatibility).
+     * @return the monthly amount
+     */
+    public double getAmount() {
+        return monthlyAmount;
+    }
+    
+    /**
+     * Sets amount (alias for monthlyAmount for compatibility).
+     * @param amount the monthly amount
+     */
+    public void setAmount(double amount) {
+        this.monthlyAmount = amount;
     }
     
     public SubscriptionStatus getStatus() {
@@ -119,6 +181,30 @@ public class Subscription extends BaseEntity {
         this.description = description;
     }
     
+    public java.time.LocalDate getStartDate() {
+        return startDate;
+    }
+    
+    public void setStartDate(java.time.LocalDate startDate) {
+        this.startDate = startDate;
+    }
+    
+    public java.time.LocalDate getNextBillingDate() {
+        return nextBillingDate;
+    }
+    
+    public void setNextBillingDate(java.time.LocalDate nextBillingDate) {
+        this.nextBillingDate = nextBillingDate;
+    }
+    
+    public java.time.LocalDate getCancelDate() {
+        return cancelDate;
+    }
+    
+    public void setCancelDate(java.time.LocalDate cancelDate) {
+        this.cancelDate = cancelDate;
+    }
+    
     /**
      * Checks if the subscription is currently active.
      * 
@@ -126,6 +212,16 @@ public class Subscription extends BaseEntity {
      */
     public boolean isActive() {
         return status == SubscriptionStatus.ACTIVE;
+    }
+    
+    /**
+     * Resumes a paused subscription.
+     */
+    public void resume() {
+        if (status == SubscriptionStatus.PAUSED) {
+            this.status = SubscriptionStatus.ACTIVE;
+            this.touch();
+        }
     }
     
     /**
@@ -141,18 +237,22 @@ public class Subscription extends BaseEntity {
      */
     public void cancel() {
         this.status = SubscriptionStatus.CANCELLED;
+        this.cancelDate = java.time.LocalDate.now();
         this.touch();
     }
     
     @Override
     public String toString() {
         return "Subscription{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", campaignId=" + campaignId +
                 ", donorId=" + donorId +
+                ", tierId=" + tierId +
                 ", tierName='" + tierName + '\'' +
                 ", monthlyAmount=" + monthlyAmount +
                 ", status=" + status +
+                ", startDate=" + startDate +
+                ", nextBillingDate=" + nextBillingDate +
                 '}';
     }
 }

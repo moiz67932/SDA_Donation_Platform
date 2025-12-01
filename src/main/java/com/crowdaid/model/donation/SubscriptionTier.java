@@ -1,15 +1,18 @@
 package com.crowdaid.model.donation;
 
+import com.crowdaid.model.common.BaseEntity;
+
 /**
- * SubscriptionTier class representing a predefined subscription tier.
+ * SubscriptionTier class representing a predefined subscription tier for a campaign.
  * Contains tier information like name, monthly amount, and benefits.
  * 
  * @author CrowdAid Development Team
  * @version 1.0.0
  */
-public class SubscriptionTier {
+public class SubscriptionTier extends BaseEntity {
     
-    private String name;
+    private Long campaignId;
+    private String tierName;
     private double monthlyAmount;
     private String description;
     private String benefits;
@@ -18,29 +21,73 @@ public class SubscriptionTier {
      * Default constructor.
      */
     public SubscriptionTier() {
+        super();
     }
     
     /**
-     * Constructor with all fields.
+     * Constructor with essential fields.
+     * 
+     * @param campaignId the campaign ID
+     * @param tierName the tier name
+     * @param monthlyAmount the monthly subscription amount
+     * @param description the tier description
+     * @param benefits the tier benefits
+     */
+    public SubscriptionTier(Long campaignId, String tierName, double monthlyAmount, String description, String benefits) {
+        this();
+        this.campaignId = campaignId;
+        this.tierName = tierName;
+        this.monthlyAmount = monthlyAmount;
+        this.description = description;
+        this.benefits = benefits;
+    }
+    
+    /**
+     * Constructor for legacy support.
      * 
      * @param name the tier name
      * @param monthlyAmount the monthly subscription amount
      * @param description the tier description
      */
     public SubscriptionTier(String name, double monthlyAmount, String description) {
-        this.name = name;
+        this();
+        this.tierName = name;
         this.monthlyAmount = monthlyAmount;
         this.description = description;
     }
     
     // Getters and Setters
     
-    public String getName() {
-        return name;
+    public Long getCampaignId() {
+        return campaignId;
     }
     
+    public void setCampaignId(Long campaignId) {
+        this.campaignId = campaignId;
+    }
+    
+    public String getTierName() {
+        return tierName;
+    }
+    
+    public void setTierName(String tierName) {
+        this.tierName = tierName;
+    }
+    
+    /**
+     * Legacy getter for compatibility.
+     * @return the tier name
+     */
+    public String getName() {
+        return tierName;
+    }
+    
+    /**
+     * Legacy setter for compatibility.
+     * @param name the tier name
+     */
     public void setName(String name) {
-        this.name = name;
+        this.tierName = name;
     }
     
     public double getMonthlyAmount() {
@@ -68,7 +115,16 @@ public class SubscriptionTier {
     }
     
     /**
-     * Gets predefined subscription tiers.
+     * Gets display text for tier selection.
+     * 
+     * @return formatted tier display string
+     */
+    public String getDisplayText() {
+        return tierName + " - $" + String.format("%.2f", monthlyAmount) + "/month";
+    }
+    
+    /**
+     * Gets predefined subscription tiers (for legacy support).
      * 
      * @return array of subscription tiers
      */
@@ -82,6 +138,6 @@ public class SubscriptionTier {
     
     @Override
     public String toString() {
-        return name + " - $" + monthlyAmount + "/month";
+        return getDisplayText();
     }
 }

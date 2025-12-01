@@ -83,6 +83,63 @@
                            styleClass="primary-button" prefWidth="150"/>
                 </VBox>
                 
+                <!-- My Subscriptions -->
+                <VBox alignment="CENTER" spacing="10" styleClass="dashboard-card"
+                     GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    <Label text="📅" styleClass="icon-label">
+                        <font><Font size="48"/></font>
+                    </Label>
+                    <Label text="My Subscriptions">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    <Label text="Manage recurring donations" 
+                          wrapText="true" textAlignment="CENTER" maxWidth="200"/>
+                    <Button fx:id="subscriptionsButton" text="View" 
+                           onAction="#handleMySubscriptions" 
+                           styleClass="primary-button" prefWidth="150"/>
+                </VBox>
+                
+                <!-- Reward Shop -->
+                <VBox alignment="CENTER" spacing="10" styleClass="dashboard-card"
+                     GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    <Label text="🎁" styleClass="icon-label">
+                        <font><Font size="48"/></font>
+                    </Label>
+                    <Label text="Reward Shop">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    <Label text="Redeem credits for rewards" 
+                          wrapText="true" textAlignment="CENTER" maxWidth="200"/>
+                    <Button fx:id="rewardShopButton" text="Shop" 
+                           onAction="#handleRewardShop" 
+                           styleClass="primary-button" prefWidth="150"/>
+                </VBox>
+                
+                <!-- Voting Requests -->
+                <VBox alignment="CENTER" spacing="10" styleClass="dashboard-card"
+                     GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <padding>
+                        <Insets top="30" right="40" bottom="30" left="40"/>
+                    </padding>
+                    <Label text="🗳️" styleClass="icon-label">
+                        <font><Font size="48"/></font>
+                    </Label>
+                    <Label text="Voting Requests">
+                        <font><Font name="System Bold" size="16"/></font>
+                    </Label>
+                    <Label text="Vote on milestone completions" 
+                          wrapText="true" textAlignment="CENTER" maxWidth="200"/>
+                    <Button fx:id="votingButton" text="Vote" 
+                           onAction="#handleVotingRequests" 
+                           styleClass="primary-button" prefWidth="150"/>
+                </VBox>
+                
             </GridPane>
             
         </VBox>

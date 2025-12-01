@@ -13,9 +13,19 @@ public enum TransactionType {
     DONATION_IN("Donation In"),
     
     /**
+     * One-time donation (alias for DONATION_IN)
+     */
+    DONATION("Donation"),
+    
+    /**
      * Subscription payment into escrow
      */
     SUBSCRIPTION_IN("Subscription In"),
+    
+    /**
+     * Subscription payment (alias for SUBSCRIPTION_IN)
+     */
+    SUBSCRIPTION("Subscription"),
     
     /**
      * Funds released from escrow to campaigner

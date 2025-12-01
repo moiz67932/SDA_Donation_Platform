@@ -68,4 +68,21 @@ public interface DonationRepository {
      * @throws SQLException if database error occurs
      */
     List<Donation> getTopDonors(Long campaignId, int limit) throws SQLException;
+    
+    /**
+     * Gets total donation amount across all campaigns.
+     * 
+     * @return total donation amount
+     * @throws SQLException if database error occurs
+     */
+    double getTotalDonationAmount() throws SQLException;
+    
+    /**
+     * Gets count of unique donors for a campaign.
+     * 
+     * @param campaignId the campaign ID
+     * @return count of unique donors
+     * @throws SQLException if database error occurs
+     */
+    int getUniqueDonorCount(Long campaignId) throws SQLException;
 }

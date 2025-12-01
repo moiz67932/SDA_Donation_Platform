@@ -57,6 +57,22 @@
                                styleClass="date-picker"/>
                 </VBox>
                 
+                <VBox spacing="8">
+                    <CheckBox fx:id="escrowEnabledCheckBox" 
+                             text="Enable Escrow Protection" 
+                             styleClass="checkbox">
+                        <tooltip>
+                            <Tooltip text="When enabled, donations will be held in escrow until milestones are completed and approved by donors through voting."/>
+                        </tooltip>
+                    </CheckBox>
+                    <Label text="Escrow requires milestone-based voting for fund release" 
+                          styleClass="hint-label" wrapText="true">
+                        <font>
+                            <Font size="10" />
+                        </font>
+                    </Label>
+                </VBox>
+                
                 <Separator/>
                 
                 <HBox spacing="15" alignment="CENTER">
