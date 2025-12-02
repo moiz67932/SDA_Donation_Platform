@@ -6,7 +6,9 @@ C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crow
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\model\campaign\MilestoneStatus.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\repository\interfaces\SubscriptionRepository.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\utils\Validator.java
+C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\repository\interfaces\EvidenceRepository.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\controller\DonorDashboardController.java
+C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\repository\mysql\MySQLEvidenceRepository.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\controller\AuthController.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\controller\BrowseCampaignsController.java
 C:\Users\Moiz\Desktop\i236001_i230728_i230529_SDA_Project\src\main\java\com\crowdaid\model\user\User.java

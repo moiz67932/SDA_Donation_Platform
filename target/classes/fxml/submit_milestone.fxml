@@ -60,31 +60,39 @@
                 </VBox>
                 
                 <VBox spacing="10">
-                    <Label text="Upload Evidence:" styleClass="section-label">
+                    <Label text="Upload Evidence Images:" styleClass="section-label">
                         <font>
                             <Font name="System Bold" size="14"/>
                         </font>
                     </Label>
-                    <Label text="(Simulated file uploads - enter file paths)" styleClass="info-label"/>
+                    <Label text="Upload images showing milestone completion (receipts, photos, etc.)" styleClass="info-label"/>
                     
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <TextField fx:id="evidence1Field" prefWidth="300" 
-                                  promptText="Evidence file path 1 (e.g., /images/receipt1.jpg)"/>
-                        <Button text="Add" onAction="#handleAddEvidence1" styleClass="secondary-button"/>
+                        <TextField fx:id="evidence1Field" editable="false" prefWidth="300" 
+                                  promptText="No file selected"/>
+                        <Button text="Choose Image" onAction="#handleChooseImage1" styleClass="secondary-button"/>
+                        <Button text="Clear" onAction="#handleClearImage1" styleClass="secondary-button"/>
                     </HBox>
                     
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <TextField fx:id="evidence2Field" prefWidth="300" 
-                                  promptText="Evidence file path 2 (optional)"/>
-                        <Button text="Add" onAction="#handleAddEvidence2" styleClass="secondary-button"/>
+                        <TextField fx:id="evidence2Field" editable="false" prefWidth="300" 
+                                  promptText="No file selected (optional)"/>
+                        <Button text="Choose Image" onAction="#handleChooseImage2" styleClass="secondary-button"/>
+                        <Button text="Clear" onAction="#handleClearImage2" styleClass="secondary-button"/>
                     </HBox>
                     
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <TextField fx:id="evidence3Field" prefWidth="300" 
-                                  promptText="Evidence file path 3 (optional)"/>
-                        <Button text="Add" onAction="#handleAddEvidence3" styleClass="secondary-button"/>
+                        <TextField fx:id="evidence3Field" editable="false" prefWidth="300" 
+                                  promptText="No file selected (optional)"/>
+                        <Button text="Choose Image" onAction="#handleChooseImage3" styleClass="secondary-button"/>
+                        <Button text="Clear" onAction="#handleClearImage3" styleClass="secondary-button"/>
                     </HBox>
                     
+                    <Label text="Selected Evidence Files:" styleClass="section-label">
+                        <font>
+                            <Font name="System Bold" size="12"/>
+                        </font>
+                    </Label>
                     <ListView fx:id="evidenceListView" prefHeight="100"/>
                 </VBox>
                 

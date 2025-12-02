@@ -217,6 +217,7 @@ public class MilestoneManagementController {
     
     /**
      * Handle submit for voting button click (UC5: Submit Milestone for Voting).
+     * Opens the Submit Milestone screen where evidence images can be uploaded.
      */
     @FXML
     private void handleSubmitForVoting(ActionEvent event) {
@@ -231,44 +232,19 @@ public class MilestoneManagementController {
         if (selectedMilestone.getStatus() != MilestoneStatus.PENDING && 
             selectedMilestone.getStatus() != MilestoneStatus.REJECTED) {
             AlertUtil.showWarning("Invalid Status", 
-                "Only pending or rejected milestones can be submitted for voting.\\nCurrent status: " + 
+                "Only pending or rejected milestones can be submitted for voting.\nCurrent status: " + 
                 selectedMilestone.getStatus());
             return;
         }
         
-        // Confirm submission
-        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("Submit for Voting");
-        confirmAlert.setHeaderText("Submit Milestone for Donor Voting");
-        confirmAlert.setContentText(
-            "This will submit the milestone to donors for voting.\\n" +
-            "Donors who contributed to this campaign will be able to vote " +
-            "to approve or reject the milestone completion.\\n\\n" +
-            "Are you sure you want to proceed?");
+        // Store selected milestone in session for the Submit Milestone screen
+        SessionManager.getInstance().setAttribute("selectedMilestoneForSubmission", selectedMilestone);
         
-        confirmAlert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    // Update milestone status to UNDER_REVIEW
-                    selectedMilestone.setStatus(MilestoneStatus.UNDER_REVIEW);
-                    milestoneRepository.update(selectedMilestone);
-                    
-                    AlertUtil.showSuccess("Submitted for Voting", 
-                        "Milestone has been submitted for voting.\\n" +
-                        "Donors will now be able to vote on this milestone completion.");
-                    
-                    // Reload milestones
-                    loadMilestones();
-                    
-                    logger.info("Milestone submitted for voting: {} from campaign: {}", 
-                               selectedMilestone.getTitle(), selectedCampaign.getTitle());
-                    
-                } catch (SQLException e) {
-                    logger.error("Error submitting milestone for voting", e);
-                    AlertUtil.showError("Database Error", "Failed to submit milestone for voting.");
-                }
-            }
-        });
+        // Navigate to Submit Milestone screen where evidence can be uploaded
+        viewLoader.loadView(viewLoader.getPrimaryStage(), 
+            "/fxml/submit_milestone.fxml", "CrowdAid - Submit Milestone Evidence");
+        
+        logger.info("Navigating to submit milestone screen for: {}", selectedMilestone.getTitle());
     }
     
     /**

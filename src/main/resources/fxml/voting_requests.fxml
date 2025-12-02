@@ -49,6 +49,40 @@
                     <Insets top="15" right="15" bottom="15" left="15"/>
                 </padding>
                 
+                <Label text="Evidence Submitted by Campaigner:" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="14"/>
+                    </font>
+                </Label>
+                
+                <HBox spacing="15" VBox.vgrow="ALWAYS">
+                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                        <Label text="Evidence Files (Click to View):" styleClass="section-label">
+                            <font>
+                                <Font name="System Bold" size="12"/>
+                            </font>
+                        </Label>
+                        <ListView fx:id="evidenceListView" prefHeight="120" onMouseClicked="#handleEvidenceClick"/>
+                        <Button text="View Selected Image" onAction="#handleViewImage" 
+                                styleClass="secondary-button" prefWidth="150"/>
+                    </VBox>
+                    
+                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                        <Label text="Evidence Details:" styleClass="section-label">
+                            <font>
+                                <Font name="System Bold" size="12"/>
+                            </font>
+                        </Label>
+                        <TextArea fx:id="evidenceDetailsArea" editable="false" wrapText="true" prefHeight="120"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <VBox spacing="15" styleClass="details-section">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                
                 <Label text="Your Comment (Optional):" styleClass="section-label">
                     <font>
                         <Font name="System Bold" size="14"/>

@@ -179,19 +179,24 @@ public class RewardShopController {
                 String.format("Redeem %s for %d credits?", selected.getName(), requiredCredits));
             
             if (confirmed) {
-                // Redeem the reward
-                rewardService.redeemReward(selected.getId(), currentDonor.getId(), "To be provided");
-                
-                // Refresh credit balance and rewards list
-                loadCreditBalance();
-                loadRewards();
-                
-                AlertUtil.showSuccess("Redemption Successful", 
-                    String.format("You have successfully redeemed %s! Your remaining credits: %d", 
-                                 selected.getName(), currentCredits - requiredCredits));
-                
-                logger.info("Donor {} successfully redeemed reward {} for {} credits", 
-                           currentDonor.getId(), selected.getName(), requiredCredits);
+                try {
+                    // Redeem the reward
+                    rewardService.redeemReward(selected.getId(), currentDonor.getId(), "To be provided");
+                    
+                    // Refresh credit balance and rewards list
+                    loadCreditBalance();
+                    loadRewards();
+                    
+                    AlertUtil.showSuccess("Redemption Successful", 
+                        String.format("You have successfully redeemed %s! Your remaining credits: %d", 
+                                     selected.getName(), currentCredits - requiredCredits));
+                    
+                    logger.info("Donor {} successfully redeemed reward {} for {} credits", 
+                               currentDonor.getId(), selected.getName(), requiredCredits);
+                } catch (Exception redemptionError) {
+                    logger.error("Error during reward redemption", redemptionError);
+                    throw redemptionError;
+                }
             }
         } catch (Exception e) {
             logger.error("Error redeeming reward", e);

@@ -3,11 +3,14 @@ package com.crowdaid.service;
 import com.crowdaid.exception.BusinessException;
 import com.crowdaid.exception.ValidationException;
 import com.crowdaid.model.campaign.Campaign;
+import com.crowdaid.model.campaign.Evidence;
 import com.crowdaid.model.campaign.Milestone;
 import com.crowdaid.model.campaign.MilestoneStatus;
 import com.crowdaid.repository.interfaces.CampaignRepository;
+import com.crowdaid.repository.interfaces.EvidenceRepository;
 import com.crowdaid.repository.interfaces.MilestoneRepository;
 import com.crowdaid.repository.mysql.MySQLCampaignRepository;
+import com.crowdaid.repository.mysql.MySQLEvidenceRepository;
 import com.crowdaid.repository.mysql.MySQLMilestoneRepository;
 import com.crowdaid.utils.Validator;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ public class MilestoneService {
     private static final Logger logger = LoggerFactory.getLogger(MilestoneService.class);
     private final MilestoneRepository milestoneRepository;
     private final CampaignRepository campaignRepository;
+    private final EvidenceRepository evidenceRepository;
     
     /**
      * Constructor initializing repositories.
@@ -41,6 +45,7 @@ public class MilestoneService {
     public MilestoneService() {
         this.milestoneRepository = new MySQLMilestoneRepository();
         this.campaignRepository = new MySQLCampaignRepository();
+        this.evidenceRepository = new MySQLEvidenceRepository();
     }
     
     /**
@@ -52,6 +57,7 @@ public class MilestoneService {
     public MilestoneService(MilestoneRepository milestoneRepository, CampaignRepository campaignRepository) {
         this.milestoneRepository = milestoneRepository;
         this.campaignRepository = campaignRepository;
+        this.evidenceRepository = new MySQLEvidenceRepository();
     }
     
     /**
@@ -196,17 +202,22 @@ public class MilestoneService {
      * Submits milestone completion with evidence (UC5: Submit Milestone Completion).
      * 
      * @param milestoneId the milestone ID
-     * @param evidenceDescription the evidence description
-     * @param evidenceUrl the evidence URL (proof document/image)
+     * @param evidenceList the list of evidence objects with file paths and descriptions
+     * @param completionDescription the completion description
      * @throws ValidationException if validation fails
      * @throws BusinessException if submission fails
      */
-    public void submitMilestoneCompletion(Long milestoneId, String evidenceDescription, String evidenceUrl)
+    public void submitMilestoneCompletion(Long milestoneId, List<Evidence> evidenceList, 
+                                         String completionDescription)
             throws ValidationException, BusinessException {
         
         Validator.validatePositive(milestoneId, "Milestone ID");
-        Validator.validateNonEmpty(evidenceDescription, "Evidence description");
-        Validator.validateNonEmpty(evidenceUrl, "Evidence URL");
+        Validator.validateNotNull(evidenceList, "Evidence list");
+        Validator.validateNonEmpty(completionDescription, "Completion description");
+        
+        if (evidenceList.isEmpty()) {
+            throw new ValidationException("At least one evidence item is required");
+        }
         
         try {
             Milestone milestone = milestoneRepository.findById(milestoneId);
@@ -220,17 +231,45 @@ public class MilestoneService {
                                           milestone.getStatus());
             }
             
+            // Save all evidence items to database
+            for (Evidence evidence : evidenceList) {
+                evidence.setMilestoneId(milestoneId);
+                evidenceRepository.save(evidence);
+            }
+            
             // Update milestone status to under review
             milestone.setStatus(MilestoneStatus.UNDER_REVIEW);
             milestoneRepository.update(milestone);
             
-            // In a real system, we would also save evidence details to Evidence table
-            logger.info("Milestone completion submitted: id={}, campaignId={}, evidence={}", 
-                       milestoneId, milestone.getCampaignId(), evidenceDescription);
+            logger.info("Milestone completion submitted: id={}, campaignId={}, evidenceCount={}", 
+                       milestoneId, milestone.getCampaignId(), evidenceList.size());
             
         } catch (SQLException e) {
             logger.error("Database error while submitting milestone completion", e);
             throw new BusinessException("Failed to submit milestone completion", e);
+        }
+    }
+    
+    /**
+     * Retrieves evidence for a milestone.
+     * 
+     * @param milestoneId the milestone ID
+     * @return list of evidence
+     * @throws ValidationException if validation fails
+     * @throws BusinessException if retrieval fails
+     */
+    public List<Evidence> getMilestoneEvidence(Long milestoneId) 
+            throws ValidationException, BusinessException {
+        Validator.validatePositive(milestoneId, "Milestone ID");
+        
+        try {
+            List<Evidence> evidenceList = evidenceRepository.findByMilestone(milestoneId);
+            logger.debug("Retrieved {} evidence items for milestone {}", evidenceList.size(), milestoneId);
+            return evidenceList;
+            
+        } catch (SQLException e) {
+            logger.error("Database error while retrieving evidence", e);
+            throw new BusinessException("Failed to retrieve evidence", e);
         }
     }
     

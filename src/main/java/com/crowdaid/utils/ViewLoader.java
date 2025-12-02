@@ -66,6 +66,13 @@ public class ViewLoader {
      */
     public void loadView(Stage stage, String fxmlPath, String title) {
         try {
+            // Remember the current window state
+            boolean wasMaximized = stage.isMaximized();
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+            double currentX = stage.getX();
+            double currentY = stage.getY();
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             
@@ -77,6 +84,16 @@ public class ViewLoader {
             
             stage.setScene(scene);
             stage.setTitle(title);
+            
+            // Restore the window state
+            if (wasMaximized) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(currentWidth);
+                stage.setHeight(currentHeight);
+                stage.setX(currentX);
+                stage.setY(currentY);
+            }
             
             logger.info("Loaded view: {}", fxmlPath);
             

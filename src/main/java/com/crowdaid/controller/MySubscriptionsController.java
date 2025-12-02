@@ -120,14 +120,14 @@ public class MySubscriptionsController {
      */
     private void loadSubscriptions() {
         try {
-            List<Subscription> subscriptions = subscriptionService.getDonorSubscriptions(currentDonor.getId());
+            List<Subscription> subscriptions = subscriptionService.getSubscriptionsByDonor(currentDonor.getId());
             ObservableList<Subscription> subscriptionList = FXCollections.observableArrayList(subscriptions);
             subscriptionsTable.setItems(subscriptionList);
             
-            logger.info("Loaded {} subscriptions", subscriptions.size());
-        } catch (BusinessException e) {
-            logger.error("Error loading subscriptions", e);
-            AlertUtil.showError("Error", "Failed to load subscriptions: " + e.getMessage());
+            logger.info("Loaded {} subscriptions for donor {}", subscriptions.size(), currentDonor.getId());
+        } catch (Exception e) {
+            logger.error("Error loading subscriptions for donor {}", currentDonor.getId(), e);
+            AlertUtil.showError("Error", "Failed to retrieve subscriptions: " + e.getMessage());
         }
     }
     

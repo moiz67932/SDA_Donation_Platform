@@ -94,7 +94,7 @@ public class MySQLRedemptionRepository implements RedemptionRepository {
     
     @Override
     public Redemption save(Redemption redemption) throws SQLException {
-        String sql = "INSERT INTO redemptions (donor_id, reward_id, credits_used, status, redemption_date) " +
+        String sql = "INSERT INTO redemptions (donor_id, reward_id, credits_spent, status, redemption_date) " +
                      "VALUES (?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -128,7 +128,7 @@ public class MySQLRedemptionRepository implements RedemptionRepository {
     
     @Override
     public void update(Redemption redemption) throws SQLException {
-        String sql = "UPDATE redemptions SET donor_id = ?, reward_id = ?, credits_used = ?, status = ? " +
+        String sql = "UPDATE redemptions SET donor_id = ?, reward_id = ?, credits_spent = ?, status = ? " +
                      "WHERE id = ?";
         
         try (Connection conn = DBConnection.getInstance().getConnection();

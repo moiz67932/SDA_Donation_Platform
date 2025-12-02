@@ -236,9 +236,25 @@ public class MySQLSubscriptionRepository implements SubscriptionRepository {
             subscription.setTierId(tierId);
         }
         
-        subscription.setTierName(rs.getString("tier_name"));
+        // Get tier_name from subscriptions table or join with subscription_tiers
+        String tierName = rs.getString("tier_name");
+        subscription.setTierName(tierName != null ? tierName : "Unknown Tier");
+        
         subscription.setMonthlyAmount(rs.getDouble("monthly_amount"));
-        subscription.setStatus(SubscriptionStatus.valueOf(rs.getString("status")));
+        
+        // Safely parse status enum
+        String statusStr = rs.getString("status");
+        if (statusStr != null) {
+            try {
+                subscription.setStatus(SubscriptionStatus.valueOf(statusStr));
+            } catch (IllegalArgumentException e) {
+                logger.warn("Invalid subscription status: {}, defaulting to ACTIVE", statusStr);
+                subscription.setStatus(SubscriptionStatus.ACTIVE);
+            }
+        } else {
+            subscription.setStatus(SubscriptionStatus.ACTIVE);
+        }
+        
         subscription.setDescription(rs.getString("description"));
         
         Date startDate = rs.getDate("start_date");

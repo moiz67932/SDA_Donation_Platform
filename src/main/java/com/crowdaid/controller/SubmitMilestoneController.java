@@ -2,7 +2,9 @@ package com.crowdaid.controller;
 
 import com.crowdaid.exception.BusinessException;
 import com.crowdaid.model.campaign.Campaign;
+import com.crowdaid.model.campaign.Evidence;
 import com.crowdaid.model.campaign.Milestone;
+import com.crowdaid.model.campaign.MilestoneStatus;
 import com.crowdaid.model.user.Campaigner;
 import com.crowdaid.model.user.User;
 import com.crowdaid.service.CampaignService;
@@ -14,9 +16,11 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +39,8 @@ public class SubmitMilestoneController {
     private final CampaignService campaignService;
     private final ViewLoader viewLoader;
     private Campaigner currentCampaigner;
-    private List<String> evidenceFiles;
+    private List<File> evidenceFiles;
+    private static final String[] ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
     
     @FXML private ComboBox<Milestone> milestoneComboBox;
     @FXML private TextArea milestoneDetailsArea;
@@ -69,6 +74,18 @@ public class SubmitMilestoneController {
         loadMilestones();
         setupListeners();
         
+        // Check if a specific milestone was pre-selected from Manage Milestones screen
+        Milestone preSelectedMilestone = (Milestone) SessionManager.getInstance()
+            .getAttribute("selectedMilestoneForSubmission");
+        
+        if (preSelectedMilestone != null) {
+            // Pre-select the milestone in the dropdown
+            milestoneComboBox.setValue(preSelectedMilestone);
+            // Clear the session attribute
+            SessionManager.getInstance().removeAttribute("selectedMilestoneForSubmission");
+            logger.info("Pre-selected milestone: {}", preSelectedMilestone.getTitle());
+        }
+        
         logger.info("Submit Milestone loaded for campaigner: {}", currentCampaigner.getEmail());
     }
     
@@ -82,9 +99,10 @@ public class SubmitMilestoneController {
             
             for (Campaign campaign : campaigns) {
                 List<Milestone> campaignMilestones = milestoneService.getCampaignMilestones(campaign.getId());
-                // Only show PLANNED milestones (ready to submit)
+                // Only show PENDING or REJECTED milestones (ready to submit)
                 for (Milestone m : campaignMilestones) {
-                    if (m.getStatus().toString().equals("PLANNED")) {
+                    MilestoneStatus status = m.getStatus();
+                    if (status == MilestoneStatus.PENDING || status == MilestoneStatus.REJECTED) {
                         allMilestones.add(m);
                     }
                 }
@@ -121,39 +139,122 @@ public class SubmitMilestoneController {
     }
     
     /**
-     * Handles add evidence buttons.
+     * Handles choose image buttons.
      */
     @FXML
-    private void handleAddEvidence1(ActionEvent event) {
-        addEvidence(evidence1Field);
+    private void handleChooseImage1(ActionEvent event) {
+        chooseImageFile(evidence1Field, 0);
     }
     
     @FXML
-    private void handleAddEvidence2(ActionEvent event) {
-        addEvidence(evidence2Field);
+    private void handleChooseImage2(ActionEvent event) {
+        chooseImageFile(evidence2Field, 1);
     }
     
     @FXML
-    private void handleAddEvidence3(ActionEvent event) {
-        addEvidence(evidence3Field);
+    private void handleChooseImage3(ActionEvent event) {
+        chooseImageFile(evidence3Field, 2);
     }
     
     /**
-     * Adds evidence file path to the list.
+     * Handles clear image buttons.
      */
-    private void addEvidence(TextField field) {
-        String filePath = field.getText().trim();
+    @FXML
+    private void handleClearImage1(ActionEvent event) {
+        clearImageFile(evidence1Field, 0);
+    }
+    
+    @FXML
+    private void handleClearImage2(ActionEvent event) {
+        clearImageFile(evidence2Field, 1);
+    }
+    
+    @FXML
+    private void handleClearImage3(ActionEvent event) {
+        clearImageFile(evidence3Field, 2);
+    }
+    
+    /**
+     * Opens file chooser to select an image file.
+     */
+    private void chooseImageFile(TextField field, int index) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Evidence Image");
         
-        if (filePath.isEmpty()) {
-            AlertUtil.showWarning("Empty Field", "Please enter a file path.");
-            return;
+        // Set file extension filters
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
+            "Image Files", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp");
+        fileChooser.getExtensionFilters().add(imageFilter);
+        
+        File selectedFile = fileChooser.showOpenDialog(viewLoader.getPrimaryStage());
+        
+        if (selectedFile != null) {
+            if (isValidImageFile(selectedFile)) {
+                field.setText(selectedFile.getName());
+                
+                // Update or add to evidence files list
+                if (index < evidenceFiles.size()) {
+                    evidenceFiles.set(index, selectedFile);
+                } else {
+                    // Fill any gaps with null
+                    while (evidenceFiles.size() < index) {
+                        evidenceFiles.add(null);
+                    }
+                    evidenceFiles.add(selectedFile);
+                }
+                
+                updateEvidenceListView();
+                logger.info("Selected evidence image: {}", selectedFile.getAbsolutePath());
+            } else {
+                AlertUtil.showError("Invalid File", "Please select a valid image file (jpg, jpeg, png, gif, bmp).");
+            }
+        }
+    }
+    
+    /**
+     * Clears the selected image file.
+     */
+    private void clearImageFile(TextField field, int index) {
+        field.clear();
+        field.setPromptText(index == 0 ? "No file selected" : "No file selected (optional)");
+        
+        if (index < evidenceFiles.size()) {
+            evidenceFiles.set(index, null);
+            updateEvidenceListView();
         }
         
-        evidenceFiles.add(filePath);
-        evidenceListView.setItems(FXCollections.observableArrayList(evidenceFiles));
-        field.clear();
+        logger.info("Cleared evidence image at index {}", index);
+    }
+    
+    /**
+     * Validates if the file is a valid image.
+     */
+    private boolean isValidImageFile(File file) {
+        if (file == null || !file.exists() || !file.isFile()) {
+            return false;
+        }
         
-        logger.info("Added evidence file: {}", filePath);
+        String fileName = file.getName().toLowerCase();
+        for (String ext : ALLOWED_IMAGE_EXTENSIONS) {
+            if (fileName.endsWith(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Updates the evidence list view with selected files.
+     */
+    private void updateEvidenceListView() {
+        List<String> fileNames = new ArrayList<>();
+        for (int i = 0; i < evidenceFiles.size(); i++) {
+            File file = evidenceFiles.get(i);
+            if (file != null) {
+                fileNames.add((i + 1) + ". " + file.getName());
+            }
+        }
+        evidenceListView.setItems(FXCollections.observableArrayList(fileNames));
     }
     
     /**
@@ -174,25 +275,41 @@ public class SubmitMilestoneController {
             return;
         }
         
-        if (evidenceFiles.isEmpty()) {
-            AlertUtil.showWarning("No Evidence", "Please add at least one evidence file.");
+        // Get only non-null evidence files
+        List<File> validEvidenceFiles = new ArrayList<>();
+        for (File file : evidenceFiles) {
+            if (file != null) {
+                validEvidenceFiles.add(file);
+            }
+        }
+        
+        if (validEvidenceFiles.isEmpty()) {
+            AlertUtil.showWarning("No Evidence", "Please upload at least one evidence image.");
             return;
         }
         
         try {
-            // Submit milestone completion - combine evidence files into single string
-            String evidenceDescription = String.join(", ", evidenceFiles);
+            // Create Evidence objects from selected files
+            List<Evidence> evidenceList = new ArrayList<>();
+            for (File file : validEvidenceFiles) {
+                Evidence evidence = new Evidence();
+                evidence.setDescription("Evidence: " + file.getName());
+                evidence.setFilePath(file.getAbsolutePath());
+                evidenceList.add(evidence);
+            }
             
+            // Submit milestone completion with evidence
             milestoneService.submitMilestoneCompletion(
                     selectedMilestone.getId(), 
-                    evidenceDescription, 
+                    evidenceList,
                     completionDesc
             );
             
             AlertUtil.showInfo("Success", 
-                    "Milestone submitted for review! Donors will be notified to vote.");
+                    "Milestone submitted for voting! Donors can now review your evidence and vote.");
             
-            logger.info("Milestone submitted for review: id={}", selectedMilestone.getId());
+            logger.info("Milestone submitted for review: id={}, evidenceCount={}", 
+                       selectedMilestone.getId(), evidenceList.size());
             
             viewLoader.loadView(viewLoader.getPrimaryStage(), 
                     "/fxml/campaigner_dashboard.fxml", "CrowdAid - Campaigner Dashboard");

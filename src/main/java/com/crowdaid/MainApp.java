@@ -56,6 +56,7 @@ public class MainApp extends Application {
             
             primaryStage.setMinWidth(1024);
             primaryStage.setMinHeight(768);
+            primaryStage.setMaximized(true);
             primaryStage.show();
             
             logger.info("CrowdAid application started successfully");
